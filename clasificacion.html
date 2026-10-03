@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clasificación - Club de Fútbol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0b132b;
+            background-image: radial-gradient(circle at top left, #1c2541, #0b132b);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .accent-gold { color: #facc15; }
+        
+        /* Personalizar el scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #1c2541; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #facc15; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Efecto visual de fondo -->
+    <div class="fixed top-0 right-0 w-[600px] h-[300px] bg-yellow-500/5 blur-[120px] rounded-full pointer-events-none z-0"></div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+        
+        <!-- ENCABEZADO -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
+            <h1 class="text-3xl font-extrabold tracking-tight uppercase">Tabla de <span class="accent-gold">Clasificación</span></h1>
+            
+            <div class="flex items-center gap-4">
+                <select id="selectTemporada" class="bg-[#1c2541] border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
+                    <option value="">Cargando...</option>
+                </select>
+                <button onclick="window.history.back()" class="border border-gray-500 text-gray-300 px-5 py-2.5 rounded-lg hover:border-white hover:text-white transition uppercase text-sm tracking-wider font-bold">
+                    Volver
+                </button>
+            </div>
+        </div>
+
+        <!-- TABLA GLASSMORPHISM -->
+        <div class="glass-card rounded-xl overflow-x-auto">
+            <table class="w-full text-sm text-center whitespace-nowrap">
+                <thead class="text-xs uppercase bg-[#1c2541] text-gray-300 border-b border-gray-600">
+                    <tr>
+                        <th class="py-4 px-4">Pos</th>
+                        <th class="py-4 px-4 text-left">Equipo</th>
+                        <th class="py-4 px-4 text-yellow-400 font-bold text-base">PTS</th>
+                        <th class="py-4 px-4">PJ</th>
+                        <th class="py-4 px-4">PG</th>
+                        <th class="py-4 px-4">PE</th>
+                        <th class="py-4 px-4">PP</th>
+                        <th class="py-4 px-4">GF</th>
+                        <th class="py-4 px-4">GC</th>
+                        <th class="py-4 px-4">DIF</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaCalificaciones">
+                    <!-- Se llena con JavaScript -->
+                    <tr>
+                        <td colspan="10" class="py-10 text-gray-400 animate-pulse">Cargando datos de Supabase...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LIBRERÍAS DE SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="basededatos.js"></script>
+
+    <!-- LÓGICA DE BASE DE DATOS -->
+    <script>
+        const selectTemporada = document.getElementById("selectTemporada");
+        const tablaBody = document.getElementById("tablaCalificaciones");
+        
+        let todaLaClasificacion = [];
+
+        // 1. DESCARGAMOS TODA LA TABLA AL ENTRAR
+        async function cargarTodo() {
+            // Asegúrate de que tu tabla en Supabase se llame exactamente 'clasificacion'
+            const { data, error } = await clienteSupabase
+                .from('clasificacion')
+                .select('*');
+
+            if (error) {
+                console.error("Error cargando clasificación:", error);
+                tablaBody.innerHTML = `<tr><td colspan="10" class="py-10 text-red-500">Error cargando los datos. Revisa la consola.</td></tr>`;
+                return;
+            }
+
+            todaLaClasificacion = data;
+
+            // Extraemos las temporadas únicas con el truco del Set
+            const temporadasUnicas = [...new Set(data.map(item => item.temporada))].filter(Boolean);
+            temporadasUnicas.sort().reverse(); // La temporada más nueva primero
+
+            selectTemporada.innerHTML = "";
+            
+            if (temporadasUnicas.length === 0) {
+                selectTemporada.innerHTML = '<option value="">Sin datos</option>';
+                tablaBody.innerHTML = `<tr><td colspan="10" class="py-10 text-gray-400">No hay equipos registrados aún.</td></tr>`;
+                return;
+            }
+
+            // Rellenamos el desplegable
+            temporadasUnicas.forEach(t => {
+                let option = document.createElement("option");
+                option.value = t;
+                option.textContent = t;
+                selectTemporada.appendChild(option);
+            });
+
+            // Pintamos la tabla de la temporada por defecto
+            cargarTabla(temporadasUnicas[0]);
+        }
+
+        // 2. PINTAMOS LA TABLA SEGÚN LA TEMPORADA
+        function cargarTabla(temporada) {
+            // Filtramos los equipos de esa temporada
+            let equipos = todaLaClasificacion.filter(e => e.temporada === temporada);
+
+            // Calculamos la diferencia de goles y ordenamos
+            equipos.forEach(e => e.dif = (e.gf || 0) - (e.gc || 0));
+            // Ordena por puntos (mayor a menor) y, en caso de empate, por diferencia de goles
+            equipos.sort((a, b) => b.puntos - a.puntos || b.dif - a.dif);
+
+            tablaBody.innerHTML = "";
+
+            equipos.forEach((equipo, index) => {
+                if(equipo.nombre_equipo == "00TEAM"){
+                    
+                }
+                const fila = document.createElement("tr");
+                
+                // Si es el primero (Líder), le ponemos un color especial
+                const esLider = index === 0;
+                const bgFila = esLider ? "bg-yellow-400/10 font-bold" : "hover:bg-white/5 border-b border-gray-700/50";
+                const colorPosicion = esLider ? "text-yellow-400 text-lg" : "text-gray-400";
+                
+                // Dar formato visual al + en la diferencia de goles
+                const difVisual = equipo.dif > 0 ? `+${equipo.dif}` : equipo.dif;
+
+                fila.className = `text-gray-300 transition duration-150 ${bgFila}`;
+                fila.innerHTML = `
+                    <td class="py-3 px-4 ${colorPosicion}">${index + 1}</td>
+                    <td class="py-3 px-4 text-left text-white font-semibold flex items-center gap-2">
+                        ${equipo.nombre_equipo} 
+                        ${esLider ? '🏆' : ''}
+                    </td>
+                    <td class="py-3 px-4 font-bold text-yellow-400 text-base">${equipo.puntos}</td>
+                    <td class="py-3 px-4">${equipo.pj}</td>
+                    <td class="py-3 px-4 text-green-400 font-semibold">${equipo.pg}</td>
+                    <td class="py-3 px-4 text-gray-400">${equipo.pe}</td>
+                    <td class="py-3 px-4 text-red-400 font-semibold">${equipo.pp}</td>
+                    <td class="py-3 px-4">${equipo.gf}</td>
+                    <td class="py-3 px-4">${equipo.gc}</td>
+                    <td class="py-3 px-4 font-medium">${difVisual}</td>
+                `;
+                tablaBody.appendChild(fila);
+            });
+        }
+
+        // 3. EVENTO DE CAMBIO DE TEMPORADA
+        selectTemporada.addEventListener("change", () => {
+            const temporadaSeleccionada = selectTemporada.value;
+            if(temporadaSeleccionada) cargarTabla(temporadaSeleccionada);
+        });
+
+        // INICIAR
+        cargarTodo();
+    </script>
+</body>
+</html>

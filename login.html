@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Club de Fútbol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* Tipografía más deportiva y colores de club */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0b132b; 
+            background-image: radial-gradient(circle at top right, #1c2541, #0b132b);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Detalles dorados */
+        .accent-gold { color: #facc15; }
+        .bg-accent-gold { background-color: #facc15; }
+        .border-accent-gold { border-color: #facc15; }
+        .focus-ring-gold:focus { 
+            outline: none; 
+            border-color: #facc15; 
+            box-shadow: 0 0 0 1px #facc15; 
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4 relative">
+
+    <!-- Efecto visual de fondo -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-blue-500/20 blur-[100px] rounded-full pointer-events-none z-0"></div>
+
+    <!-- Contenedor del Login -->
+    <div class="glass-card p-8 sm:p-10 rounded-2xl w-full max-w-md relative z-10">
+
+        <!-- Logo y Título -->
+        <div class="text-center mb-10 flex flex-col items-center">
+            <!-- AQUÍ PONES TU LOGO -->
+            <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-4 border border-white/20 overflow-hidden">
+                <!-- <img src="ruta_a_tu_logo.png" alt="Logo del Equipo" class="w-full h-full object-cover"> -->
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path></svg>
+            </div>
+            <h1 class="text-3xl font-extrabold tracking-tight uppercase">Accede al <span class="accent-gold">Club</span></h1>
+            <p class="text-gray-400 text-sm mt-2 font-medium">Inicia sesión para gestionar tu plantilla</p>
+        </div>
+
+        <!-- Formulario -->
+        <form class="space-y-6" id="form">
+
+            <!-- Campo Email -->
+            <div>
+                <label for="email" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Correo electrónico</label>
+                <input type="email" id="email"
+                    class="w-full bg-[#1c2541]/80 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus-ring-gold transition duration-200"
+                    placeholder="jugador@equipo.com" required>
+            </div>
+
+            <!-- Campo Contraseña -->
+            <div>
+                <label for="password" class="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">Contraseña</label>
+                <input type="password" id="password"
+                    class="w-full bg-[#1c2541]/80 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus-ring-gold transition duration-200"
+                    placeholder="••••••••" required>
+
+                <div class="flex justify-end mt-2">
+                    <a href="#" class="text-xs text-gray-400 hover:text-yellow-400 transition font-medium">¿Olvidaste tu contraseña?</a>
+                </div>
+            </div>
+
+            <!-- Botón de Entrar -->
+            <button type="submit" id="btn-submit"
+                class="w-full bg-accent-gold text-[#0b132b] font-extrabold text-lg py-3 px-4 rounded-lg hover:bg-yellow-400 transition-all duration-300 shadow-[0_0_15px_rgba(250,204,21,0.3)] mt-6 uppercase tracking-wider">
+                Saltar al Campo
+            </button>
+        </form>
+
+        <!-- Registro -->
+        <p class="text-center text-gray-400 text-sm mt-8">
+            ¿Aún no tienes ficha? <a href="register.html" class="accent-gold hover:underline font-bold">Regístrate aquí</a>
+        </p>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public/basededatos.js"></script>
+    <script>
+        document.getElementById("form").addEventListener("submit", async function (evento) {
+            evento.preventDefault(); // ¡CRUCIAL! Esto evita que la página recargue al darle al botón
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const boton = document.getElementById("btn-submit"); // Definimos el botón para usarlo luego
+            
+            boton.textContent = "Comprobando credenciales...";
+
+            // Llamada a Supabase
+            const { data, error } = await clienteSupabase.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                alert("Error: Usuario o contraseña incorrectos.");
+                boton.textContent = "Saltar al Campo"; // Restauramos el texto original
+            } else {
+                // ¡Éxito!
+                console.log("Sesión iniciada:", data);
+                boton.textContent = "¡Bienvenido al equipo!";
+                boton.classList.remove("bg-accent-gold", "text-[#0b132b]");
+                boton.classList.add("bg-green-500", "text-white", "border-none"); // Lo ponemos verde para indicar éxito
+
+                // Redirigimos al panel principal después de 1 segundo
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+
+</html>
