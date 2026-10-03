@@ -86,7 +86,6 @@
                         Bajas / Lesionados:
                     </span>
                     <div id="lesionadosContainer" class="flex flex-wrap gap-2">
-                        <!-- Los lesionados se cargan aquí -->
                         <span class="text-gray-400 text-xs italic">Cargando...</span>
                     </div>
                 </div>
@@ -94,8 +93,7 @@
 
         </div>
 
-        <!-- CONTENEDOR DE JORNADAS (Grid ajustado a 3 y 4 columnas) -->
-        <!-- Cambiado a: sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 -->
+        <!-- CONTENEDOR DE JORNADAS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="jornadasContainer">
             <p class="text-gray-400 col-span-full text-center py-10">Cargando partidos...</p>
         </div>
@@ -114,36 +112,32 @@
         
         let todasLasJornadas = [];
 
-        // 1. DESCARGAR TODOS LOS DATOS (Jornadas y Lesionados)
+        // 1. DESCARGAR TODOS LOS DATOS
         async function cargarTodo() {
             
             // --- CARGAR LESIONADOS ---
             const { data: jugadores, error: errorLesionados } = await clienteSupabase
                 .from('jugadores')
                 .select('*');
-                console.log(jugadores)
+            
             if (!errorLesionados && jugadores) {
                 lesionadosContainer.innerHTML = "";
                 if (jugadores.length === 0) {
                     lesionadosContainer.innerHTML = '<span class="text-green-400 text-xs font-medium">Plantilla al 100% (Sin bajas)</span>';
                 } else {
                     jugadores.forEach(baja => {
-                        
                         if(baja.ESTADO == "LESIONADO"){
-                             const chip = document.createElement('span');
+                            const chip = document.createElement('span');
                             chip.className = "bg-red-500/10 text-red-300 border border-red-500/30 px-2.5 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1";
                             chip.innerHTML = `🤕 ${baja.nombre} <span class="text-white-500 font-normal ml-1">(${baja.ESTADO_DESC|| 'Baja'})</span>`;
                             lesionadosContainer.appendChild(chip);
                         }
-
-                       
                     });
                 }
             } else {
                 lesionadosContainer.innerHTML = '<span class="text-gray-500 text-xs">No se pudo cargar la enfermería.</span>';
             }
 
-            // --- CARGAR JORNADAS ---
             const { data: jornadas, error } = await clienteSupabase
                 .from('jornadas')
                 .select(`
@@ -152,12 +146,12 @@
                     temporada,
                     rival,
                     resultado,
+                    mvp,
                     goles_jornada ( 
                         goles,
                         nombre_jugador
                     )
-                `);
-                // Como jornada es de tipo texto, es mejor no hacer el .order() aquí y ordenarlo con JS luego
+                `).order('jornada', { ascending: false });
 
             if (error) {
                 console.error("Error cargando jornadas:", error);
@@ -165,13 +159,12 @@
                 return;
             }
 
-            // Limpiar datos sucios (.trim()) y forzar conversión de jornada a número para ordenar bien
+            // Limpiar datos sucios
             todasLasJornadas = jornadas.map(j => ({
                 ...j,
                 temporada: j.temporada ? j.temporada.trim() : ''
-            })).sort((a, b) => parseInt(a.jornada) - parseInt(b.jornada)); // Orden numérico arreglado
+            }))
 
-            // Extraer temporadas únicas limpias
             const temporadasUnicas = [...new Set(todasLasJornadas.map(j => j.temporada))].filter(Boolean);
             temporadasUnicas.sort().reverse(); 
 
@@ -192,10 +185,9 @@
             pintarJornadasPorTemporada(temporadasUnicas[0]);
         }
 
-        // 2. PINTAR LAS TARJETAS (Ahora más compactas)
+        // 2. PINTAR LAS TARJETAS DE PARTIDOS
         function pintarJornadasPorTemporada(temporadaSeleccionada) {
             jornadasContainer.innerHTML = "";
-
             const jornadasFiltradas = todasLasJornadas.filter(j => j.temporada === temporadaSeleccionada);
 
             if (jornadasFiltradas.length === 0) {
@@ -204,6 +196,7 @@
             }
 
             jornadasFiltradas.forEach(partido => {
+                // Color del resultado
                 let claseResultado = "text-gray-300";
                 if(partido.resultado) {
                     const goles = partido.resultado.split('-');
@@ -212,13 +205,14 @@
                     else claseResultado = "text-yellow-400 font-bold";
                 }
 
+                // Generar Goleadores
                 let goleadoresHTML = "";
                 if (partido.goles_jornada && partido.goles_jornada.length > 0) {
                     goleadoresHTML = partido.goles_jornada.map(gol => {
                         const nombreJugador = gol.jugadores ? gol.jugadores.nombre : (gol.nombre_jugador || 'Desconocido');
                         return `
                             <li class="flex justify-between items-center py-1.5 border-b border-gray-700/50 last:border-0">
-                                <span class="text-xs font-medium text-gray-300"><span class="mr-1">⚽</span>${nombreJugador}</span>
+                                <span class="text-xs font-medium text-gray-300 flex items-center"><span class="mr-1">⚽</span>${nombreJugador}</span>
                                 <span class="text-[10px] font-bold bg-white/10 px-1.5 py-0.5 rounded text-yellow-400">${gol.goles}</span>
                             </li>
                         `;
@@ -227,8 +221,18 @@
                     goleadoresHTML = '<li class="text-[10px] text-gray-500 italic py-1">Sin goles</li>';
                 }
 
+                // Generar caja de MVP (Si existe en la base de datos para este partido)
+                let mvpHTML = "";
+                if (partido.mvp && partido.mvp.trim() !== "") {
+                    mvpHTML = `
+                        <div class="bg-yellow-400/10 border border-yellow-400/30 rounded-lg p-2 mt-2 flex items-center justify-center gap-2">
+                            <span class="text-[10px] font-bold text-yellow-400 uppercase tracking-widest">⭐ MVP:</span>
+                            <span class="text-xs font-bold text-white">${partido.mvp}</span>
+                        </div>
+                    `;
+                }
+
                 const card = document.createElement("div");
-                // Clases modificadas: flex flex-col h-full para igualar alturas
                 card.className = "glass-card rounded-xl overflow-hidden hover:-translate-y-1 transition duration-300 flex flex-col h-full border border-gray-700/50";
                 
                 card.innerHTML = `
@@ -247,6 +251,9 @@
                                 ${goleadoresHTML}
                             </ul>
                         </div>
+                        
+                        <!-- Aquí se inyecta el MVP si existe -->
+                        ${mvpHTML}
                     </div>
                 `;
                 jornadasContainer.appendChild(card);
