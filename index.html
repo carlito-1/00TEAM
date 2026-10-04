@@ -23,57 +23,108 @@
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
         }
 
-        .accent-gold { color: #facc15; }
-        .bg-accent-gold { background-color: #facc15; }
-        .border-accent-gold { border-color: #facc15; }
-        
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: #1c2541; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #facc15; }
+        .accent-gold {
+            color: #facc15;
+        }
+
+        .bg-accent-gold {
+            background-color: #facc15;
+        }
+
+        .border-accent-gold {
+            border-color: #facc15;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1c2541;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #facc15;
+        }
+
+        /* Animación para el borde del próximo partido */
+        @keyframes pulse-border {
+            0% {
+                border-color: rgba(74, 222, 128, 0.4);
+            }
+
+            50% {
+                border-color: rgba(74, 222, 128, 1);
+                box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+            }
+
+            100% {
+                border-color: rgba(74, 222, 128, 0.4);
+            }
+        }
+
+        .proximo-partido-card {
+            animation: pulse-border 2.5s infinite;
+        }
     </style>
 </head>
 
 <body class="p-4 md:p-8">
 
     <!-- Efecto visual de fondo -->
-    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+    <div
+        class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none z-0">
+    </div>
 
     <div class="max-w-7xl mx-auto relative z-10">
 
         <!-- ENCABEZADO -->
-        <header class="flex flex-col lg:flex-row justify-between items-center mb-10 gap-6 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
+        <header
+            class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-6 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
             <!-- Logo y Nombre -->
             <div class="flex items-center gap-4">
-                <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center border border-white/20 overflow-hidden shrink-0">
+                <div
+                    class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center border border-white/20 overflow-hidden shrink-0">
                     <img src="public/escudo.png" alt="Logo" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <h1 class="text-3xl font-extrabold tracking-tight uppercase"><span class="accent-gold" id="nombreEquipo">00 TEAM</span></h1>
+                    <h1 class="text-3xl font-extrabold tracking-tight uppercase"><span class="accent-gold"
+                            id="nombreEquipo">00 TEAM</span></h1>
                     <p class="text-sm text-gray-400 font-medium">Panel de Gestión Deportiva</p>
                 </div>
             </div>
 
             <!-- Botones de Acción -->
             <div class="flex flex-wrap gap-3 justify-center">
-                <button id="btnVotar" class="bg-accent-gold text-[#0b132b] font-bold px-5 py-2.5 rounded-lg hover:bg-yellow-400 transition shadow-[0_0_15px_rgba(250,204,21,0.2)] uppercase text-sm tracking-wider">
+                <button id="btnVotar"
+                    class="bg-accent-gold text-[#0b132b] font-bold px-5 py-2.5 rounded-lg hover:bg-yellow-400 transition shadow-[0_0_15px_rgba(250,204,21,0.2)] uppercase text-sm tracking-wider">
                     MVP del Mes
                 </button>
-                <button id="btnCalificaciones" class="border border-yellow-400 text-yellow-400 px-5 py-2.5 rounded-lg hover:bg-yellow-400 hover:text-[#0b132b] transition uppercase text-sm tracking-wider font-bold">
+                <button id="btnCalificaciones"
+                    class="border border-yellow-400 text-yellow-400 px-5 py-2.5 rounded-lg hover:bg-yellow-400 hover:text-[#0b132b] transition uppercase text-sm tracking-wider font-bold">
                     Clasificación
                 </button>
-                <button id="btnEstadisticas" class="border border-gray-500 text-gray-300 px-5 py-2.5 rounded-lg hover:border-white hover:text-white transition uppercase text-sm tracking-wider font-bold">
+                <button id="btnEstadisticas"
+                    class="border border-gray-500 text-gray-300 px-5 py-2.5 rounded-lg hover:border-white hover:text-white transition uppercase text-sm tracking-wider font-bold">
                     Estadísticas
                 </button>
             </div>
         </header>
 
+        <!-- BANNER PRÓXIMO PARTIDO (Se llena por JS) -->
+        <div id="proximoPartidoContainer"></div>
+
         <!-- FILTROS Y ENFERMERÍA -->
         <div class="flex flex-col md:flex-row gap-6 mb-8 items-start md:items-center justify-between">
-            
+
             <!-- FILTRO DE TEMPORADA -->
-            <div class="flex items-center gap-4 bg-[#1c2541]/50 p-3 px-4 rounded-xl border border-gray-700 w-full md:w-auto">
-                <label for="temporadaSelect" class="text-sm font-bold text-gray-300 uppercase tracking-wider">Temporada:</label>
-                <select id="temporadaSelect" class="bg-[#0b132b] border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-1.5 outline-none font-semibold cursor-pointer">
+            <div
+                class="flex items-center gap-4 bg-[#1c2541]/50 p-3 px-4 rounded-xl border border-gray-700 w-full md:w-auto">
+                <label for="temporadaSelect"
+                    class="text-sm font-bold text-gray-300 uppercase tracking-wider">Temporada:</label>
+                <select id="temporadaSelect"
+                    class="bg-[#0b132b] border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-1.5 outline-none font-semibold cursor-pointer">
                     <option value="">Cargando...</option>
                 </select>
             </div>
@@ -81,8 +132,13 @@
             <!-- SECCIÓN LESIONADOS -->
             <div class="flex-grow glass-card rounded-xl p-3 border border-red-500/30 w-full md:w-auto">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                    <span class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center gap-1 shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span
+                        class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center gap-1 shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
                         Bajas / Lesionados:
                     </span>
                     <div id="lesionadosContainer" class="flex flex-wrap gap-2">
@@ -109,9 +165,11 @@
         const temporadaSelect = document.getElementById("temporadaSelect");
         const jornadasContainer = document.getElementById("jornadasContainer");
         const lesionadosContainer = document.getElementById("lesionadosContainer");
-        
+        const proximoPartidoContainer = document.getElementById("proximoPartidoContainer");
+
         let todasLasJornadas = [];
 
+        // 1. DESCARGAR TODOS LOS DATOS
         // 1. DESCARGAR TODOS LOS DATOS
         async function cargarTodo() {
             
@@ -138,6 +196,7 @@
                 lesionadosContainer.innerHTML = '<span class="text-gray-500 text-xs">No se pudo cargar la enfermería.</span>';
             }
 
+            // --- CARGAR JORNADAS ---
             const { data: jornadas, error } = await clienteSupabase
                 .from('jornadas')
                 .select(`
@@ -147,6 +206,9 @@
                     rival,
                     resultado,
                     mvp,
+                    lugar,
+                    hora,
+                    proximo_partido,
                     goles_jornada ( 
                         goles,
                         nombre_jugador
@@ -163,8 +225,49 @@
             todasLasJornadas = jornadas.map(j => ({
                 ...j,
                 temporada: j.temporada ? j.temporada.trim() : ''
-            }))
+            }));
 
+            // --- LÓGICA PARA EL PRÓXIMO PARTIDO ---
+            const proximoPartido = todasLasJornadas.find(j => j.proximo_partido === true);
+
+            if (proximoPartido) {
+                const rivalStr = proximoPartido.rival || 'Por definir';
+                const horaStr = proximoPartido.hora || 'Por definir';
+                const lugarStr = proximoPartido.lugar || 'Por definir';
+                const jornadaStr = proximoPartido.jornada || '?';
+                
+                const enlaceMapa = proximoPartido.lugar ? `mapa.html?nombre=${encodeURIComponent(proximoPartido.lugar)}` : '#';
+                const botonMapa = proximoPartido.lugar ? `<a href="${enlaceMapa}" target="_blank" class="bg-green-500/20 hover:bg-green-500/40 text-green-300 text-xs font-bold py-2.5 px-4 rounded-lg transition border border-green-500/50 shrink-0 shadow-[0_0_10px_rgba(74,222,128,0.2)]">📍 Ver Mapa</a>` : '';
+
+                proximoPartidoContainer.innerHTML = `
+                    <div class="proximo-partido-card glass-card rounded-2xl p-5 md:p-6 mb-8 border-l-4 bg-gradient-to-r from-green-500/10 to-transparent flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="relative flex h-3 w-3">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                </span>
+                                <h2 class="text-green-400 font-bold uppercase tracking-widest text-[11px]">Siguiente Partido • Jornada ${jornadaStr}</h2>
+                            </div>
+                            
+                            <p class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">00TEAM <span class="text-gray-500 font-normal mx-2 text-xl">vs</span> <span class="text-green-50">${rivalStr}</span></p>
+                            
+                            <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3 text-sm text-gray-300 font-medium bg-black/20 inline-flex p-2 px-3 rounded-lg border border-white/5">
+                                <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${lugarStr}</span>
+                                <span class="text-gray-600">|</span>
+                                <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>${horaStr}</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex">
+                            ${botonMapa}
+                        </div>
+                    </div>
+                `;
+            } else {
+                proximoPartidoContainer.innerHTML = ''; 
+            }
+
+            // --- LÓGICA DE TEMPORADAS INTELIGENTE ---
             const temporadasUnicas = [...new Set(todasLasJornadas.map(j => j.temporada))].filter(Boolean);
             temporadasUnicas.sort().reverse(); 
 
@@ -182,13 +285,29 @@
                 temporadaSelect.appendChild(option);
             });
 
-            pintarJornadasPorTemporada(temporadasUnicas[0]);
+            // Buscamos la temporada más reciente que tenga al menos 1 partido YA JUGADO
+            let temporadaPorDefecto = temporadasUnicas[0]; 
+            
+            for (const temp of temporadasUnicas) {
+                // Filtramos para contar cuántos partidos hay en esta temporada que NO sean el próximo partido
+                const partidosJugados = todasLasJornadas.filter(j => j.temporada === temp && j.proximo_partido !== true);
+                
+                if (partidosJugados.length > 0) {
+                    temporadaPorDefecto = temp;
+                    break; 
+                }
+            }
+
+            // Aplicamos la temporada correcta y pintamos ÚNICAMENTE esta
+            temporadaSelect.value = temporadaPorDefecto;
+            pintarJornadasPorTemporada(temporadaPorDefecto);
         }
 
         // 2. PINTAR LAS TARJETAS DE PARTIDOS
         function pintarJornadasPorTemporada(temporadaSeleccionada) {
             jornadasContainer.innerHTML = "";
-            const jornadasFiltradas = todasLasJornadas.filter(j => j.temporada === temporadaSeleccionada);
+            // Filtramos por temporada Y le decimos que ignore el que está marcado como próximo partido
+        const jornadasFiltradas = todasLasJornadas.filter(j => j.temporada === temporadaSeleccionada && j.proximo_partido !== true);
 
             if (jornadasFiltradas.length === 0) {
                 jornadasContainer.innerHTML = '<p class="text-gray-400 col-span-full text-center py-10">Aún no hay partidos en esta temporada.</p>';
@@ -196,16 +315,14 @@
             }
 
             jornadasFiltradas.forEach(partido => {
-                // Color del resultado
                 let claseResultado = "text-gray-300";
-                if(partido.resultado) {
+                if (partido.resultado) {
                     const goles = partido.resultado.split('-');
-                    if(goles[0] > goles[1]) claseResultado = "text-green-400 font-bold";
+                    if (goles[0] > goles[1]) claseResultado = "text-green-400 font-bold";
                     else if (goles[0] < goles[1]) claseResultado = "text-red-400 font-bold";
                     else claseResultado = "text-yellow-400 font-bold";
                 }
 
-                // Generar Goleadores
                 let goleadoresHTML = "";
                 if (partido.goles_jornada && partido.goles_jornada.length > 0) {
                     goleadoresHTML = partido.goles_jornada.map(gol => {
@@ -221,7 +338,26 @@
                     goleadoresHTML = '<li class="text-[10px] text-gray-500 italic py-1">Sin goles</li>';
                 }
 
-                // Generar caja de MVP (Si existe en la base de datos para este partido)
+                let lugarHTML = "";
+                if (partido.lugar && partido.lugar.trim() !== "") {
+                    const enlaceMapa = `mapa.html?nombre=${encodeURIComponent(partido.lugar)}`;
+                    lugarHTML = `
+                        <div class="mb-3 flex items-center justify-between text-xs bg-white/5 p-2 rounded-lg border border-white/10">
+                            <span class="flex items-center gap-1.5 text-gray-300 font-medium">
+                                <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                ${partido.lugar}
+                            </span>
+                            ${(partido.lugar)
+                            ? `<a href="${enlaceMapa}" target="_blank" class="text-blue-400 hover:text-blue-300 font-bold hover:underline transition">Ver mapa</a>`
+                            : `<span class="text-gray-500 italic text-[10px]">Sin coordenadas</span>`
+                        }
+                        </div>
+                    `;
+                }
+
                 let mvpHTML = "";
                 if (partido.mvp && partido.mvp.trim() !== "") {
                     mvpHTML = `
@@ -234,7 +370,7 @@
 
                 const card = document.createElement("div");
                 card.className = "glass-card rounded-xl overflow-hidden hover:-translate-y-1 transition duration-300 flex flex-col h-full border border-gray-700/50";
-                
+
                 card.innerHTML = `
                     <div class="bg-[#1c2541] px-4 py-2 border-b border-gray-700 flex justify-between items-center">
                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Jornada ${partido.jornada}</span>
@@ -245,6 +381,8 @@
                             00TEAM <span class="text-gray-500 font-normal mx-1">vs</span> ${partido.rival}
                         </h3>
                         
+                        ${lugarHTML}
+                        
                         <div class="bg-black/40 rounded-lg p-2 mt-auto">
                             <h4 class="text-[9px] text-gray-500 uppercase font-bold mb-1.5 tracking-wider">Goleadores</h4>
                             <ul class="m-0 p-0">
@@ -252,7 +390,6 @@
                             </ul>
                         </div>
                         
-                        <!-- Aquí se inyecta el MVP si existe -->
                         ${mvpHTML}
                     </div>
                 `;
@@ -263,7 +400,7 @@
         // 3. EVENTOS
         temporadaSelect.addEventListener("change", (e) => {
             const idSeleccionado = e.target.value;
-            if(idSeleccionado) pintarJornadasPorTemporada(idSeleccionado);
+            if (idSeleccionado) pintarJornadasPorTemporada(idSeleccionado);
         });
 
         document.getElementById("btnVotar").addEventListener("click", () => { window.location.href = "potm.html"; });
@@ -273,4 +410,5 @@
         cargarTodo();
     </script>
 </body>
+
 </html>

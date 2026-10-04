@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        #map {
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div id="map"></div>
+    </main>
+</body>
+<script>
+    if (!navigator.geolocation) {
+        console.error("La API de geolocalización no es compatible con este navegador.");
+    } else {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                console.log("Latitud:", position.coords.latitude);
+                console.log("Longitud:", position.coords.longitude);
+
+                // Comprobamos que el div del mapa exista en el HTML para evitar errores
+                const mapContainer = document.getElementById('map');
+                if (!mapContainer) {
+                    console.error("Error: No se ha encontrado el <div id='map'> en el HTML");
+                    return;
+                }
+
+                // Inicializamos Leaflet
+                var map = L.map('map').setView([position.coords.latitude, position.coords.longitude], 13);
+
+                // Sustituye el L.tileLayer anterior por este:
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                    attribution: 'Tiles &copy; Esri'
+                }).addTo(map);
+
+                // Tu ubicación
+                L.marker([position.coords.latitude, position.coords.longitude]).addTo(map)
+                    .bindPopup('Tu ubicación actual')
+                    .openPopup();
+
+
+                // Leer la URL que nos manda el index.html
+                const parametros = new URLSearchParams(window.location.search);
+                const lat = parametros.get('lat');
+                const lng = parametros.get('lng');
+                const lugar = parametros.get('nombre');
+                if (lugar == "ALUCHE") {
+                    L.marker([40.384601, -3.767584]).addTo(map)
+                        .bindPopup('Este es el campo de futbol municipal de aluche').openPopup();
+                } else if (lugar == "LAS CRUCES") {
+                    L.marker([40.378855, -3.756261]).addTo(map)
+                        .bindPopup('Este es el campo de futbol municipal de las cruces').openPopup();
+                }
+
+
+                // Ahora ya puedes usar 'lat' y 'lng' dentro de tu L.marker([lat, lng]).addTo(map)
+                // Ubicación del Juan de la Cierva
+
+            },
+            function (error) {
+                console.error("Error al obtener la ubicación:", error.message);
+                if (error.code === 1) {
+                    console.log("Permiso denegado por el usuario.");
+                } else if (error.code === 2) {
+                    console.log("No se pudo determinar la ubicación (problema de red o GPS).");
+                } else if (error.code === 3) {
+                    console.log("Tiempo de espera agotado. El navegador tardó demasiado.");
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 15000, // Subido a 15 segundos para dar margen al navegador
+                maximumAge: 0
+            }
+        );
+    }
+</script>
+
+</html>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,30 +23,48 @@
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
         }
 
-        .accent-gold { color: #facc15; }
-        
+        .accent-gold {
+            color: #facc15;
+        }
+
         /* Personalizar el scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: #1c2541; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #facc15; }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1c2541;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #facc15;
+        }
     </style>
 </head>
+
 <body class="p-4 md:p-8">
 
     <!-- Efecto visual de fondo -->
-    <div class="fixed top-0 right-0 w-[600px] h-[300px] bg-yellow-500/5 blur-[120px] rounded-full pointer-events-none z-0"></div>
+    <div
+        class="fixed top-0 right-0 w-[600px] h-[300px] bg-yellow-500/5 blur-[120px] rounded-full pointer-events-none z-0">
+    </div>
 
     <div class="max-w-6xl mx-auto relative z-10">
-        
+
         <!-- ENCABEZADO -->
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
-            <h1 class="text-3xl font-extrabold tracking-tight uppercase">Tabla de <span class="accent-gold">Clasificación</span></h1>
-            
+        <div
+            class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
+            <h1 class="text-3xl font-extrabold tracking-tight uppercase">Tabla de <span
+                    class="accent-gold">Clasificación</span></h1>
+
             <div class="flex items-center gap-4">
-                <select id="selectTemporada" class="bg-[#1c2541] border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
+                <select id="selectTemporada"
+                    class="bg-[#1c2541] border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
                     <option value="">Cargando...</option>
                 </select>
-                <button onclick="window.history.back()" class="border border-gray-500 text-gray-300 px-5 py-2.5 rounded-lg hover:border-white hover:text-white transition uppercase text-sm tracking-wider font-bold">
+                <button onclick="window.history.back()"
+                    class="border border-gray-500 text-gray-300 px-5 py-2.5 rounded-lg hover:border-white hover:text-white transition uppercase text-sm tracking-wider font-bold">
                     Volver
                 </button>
             </div>
@@ -86,7 +105,7 @@
     <script>
         const selectTemporada = document.getElementById("selectTemporada");
         const tablaBody = document.getElementById("tablaCalificaciones");
-        
+
         let todaLaClasificacion = [];
 
         // 1. DESCARGAMOS TODA LA TABLA AL ENTRAR
@@ -109,7 +128,7 @@
             temporadasUnicas.sort().reverse(); // La temporada más nueva primero
 
             selectTemporada.innerHTML = "";
-            
+
             if (temporadasUnicas.length === 0) {
                 selectTemporada.innerHTML = '<option value="">Sin datos</option>';
                 tablaBody.innerHTML = `<tr><td colspan="10" class="py-10 text-gray-400">No hay equipos registrados aún.</td></tr>`;
@@ -141,16 +160,16 @@
             tablaBody.innerHTML = "";
 
             equipos.forEach((equipo, index) => {
-                if(equipo.nombre_equipo == "00TEAM"){
-                    
+                if (equipo.nombre_equipo == "00TEAM") {
+
                 }
                 const fila = document.createElement("tr");
-                
+
                 // Si es el primero (Líder), le ponemos un color especial
                 const esLider = index === 0;
                 const bgFila = esLider ? "bg-yellow-400/10 font-bold" : "hover:bg-white/5 border-b border-gray-700/50";
                 const colorPosicion = esLider ? "text-yellow-400 text-lg" : "text-gray-400";
-                
+
                 // Dar formato visual al + en la diferencia de goles
                 const difVisual = equipo.dif > 0 ? `+${equipo.dif}` : equipo.dif;
 
@@ -177,11 +196,12 @@
         // 3. EVENTO DE CAMBIO DE TEMPORADA
         selectTemporada.addEventListener("change", () => {
             const temporadaSeleccionada = selectTemporada.value;
-            if(temporadaSeleccionada) cargarTabla(temporadaSeleccionada);
+            if (temporadaSeleccionada) cargarTabla(temporadaSeleccionada);
         });
 
         // INICIAR
         cargarTodo();
     </script>
 </body>
+
 </html>
