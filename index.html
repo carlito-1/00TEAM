@@ -171,22 +171,22 @@
 
         // 1. DESCARGAR TODOS LOS DATOS
         async function cargarTodo() {
-            
+
             // --- CARGAR LESIONADOS ---
             const { data: jugadores, error: errorLesionados } = await clienteSupabase
                 .from('jugadores')
                 .select('*');
-            
+
             if (!errorLesionados && jugadores) {
                 lesionadosContainer.innerHTML = "";
                 if (jugadores.length === 0) {
                     lesionadosContainer.innerHTML = '<span class="text-green-400 text-xs font-medium">Plantilla al 100% (Sin bajas)</span>';
                 } else {
                     jugadores.forEach(baja => {
-                        if(baja.ESTADO == "LESIONADO"){
+                        if (baja.ESTADO == "LESIONADO") {
                             const chip = document.createElement('span');
                             chip.className = "bg-red-500/10 text-red-300 border border-red-500/30 px-2.5 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1";
-                            chip.innerHTML = `🤕 ${baja.nombre} <span class="text-white-500 font-normal ml-1">(${baja.ESTADO_DESC|| 'Baja'})</span>`;
+                            chip.innerHTML = `🤕 ${baja.nombre} <span class="text-white-500 font-normal ml-1">(${baja.ESTADO_DESC || 'Baja'})</span>`;
                             lesionadosContainer.appendChild(chip);
                         }
                     });
@@ -235,7 +235,7 @@
                 const lugarStr = proximoPartido.lugar || 'Por definir';
                 const jornadaStr = proximoPartido.jornada || '?';
                 const temporadaStr = proximoPartido.temporada || 'Por definir';
-                
+
                 const enlaceMapa = proximoPartido.lugar ? `mapa.html?nombre=${encodeURIComponent(proximoPartido.lugar)}` : '#';
                 const botonMapa = proximoPartido.lugar ? `<a href="${enlaceMapa}" target="_blank" class="bg-green-500/20 hover:bg-green-500/40 text-green-300 text-xs font-bold py-2.5 px-4 rounded-lg transition border border-green-500/50 shrink-0 shadow-[0_0_10px_rgba(74,222,128,0.2)]">📍 Ver Mapa</a>` : '';
 
@@ -264,12 +264,12 @@
                     </div>
                 `;
             } else {
-                proximoPartidoContainer.innerHTML = ''; 
+                proximoPartidoContainer.innerHTML = '';
             }
 
             // --- LÓGICA DE TEMPORADAS INTELIGENTE ---
             const temporadasUnicas = [...new Set(todasLasJornadas.map(j => j.temporada))].filter(Boolean);
-            temporadasUnicas.sort().reverse(); 
+            temporadasUnicas.sort().reverse();
 
             temporadaSelect.innerHTML = "";
             if (temporadasUnicas.length === 0) {
@@ -286,15 +286,15 @@
             });
 
             // Buscamos la temporada más reciente que tenga al menos 1 partido YA JUGADO
-            let temporadaPorDefecto = temporadasUnicas[0]; 
-            
+            let temporadaPorDefecto = temporadasUnicas[0];
+
             for (const temp of temporadasUnicas) {
                 // Filtramos para contar cuántos partidos hay en esta temporada que NO sean el próximo partido
                 const partidosJugados = todasLasJornadas.filter(j => j.temporada === temp && j.proximo_partido !== true);
-                
+
                 if (partidosJugados.length > 0) {
                     temporadaPorDefecto = temp;
-                    break; 
+                    break;
                 }
             }
 
@@ -307,7 +307,7 @@
         function pintarJornadasPorTemporada(temporadaSeleccionada) {
             jornadasContainer.innerHTML = "";
             // Filtramos por temporada Y le decimos que ignore el que está marcado como próximo partido
-        const jornadasFiltradas = todasLasJornadas.filter(j => j.temporada === temporadaSeleccionada && j.proximo_partido !== true);
+            const jornadasFiltradas = todasLasJornadas.filter(j => j.temporada === temporadaSeleccionada && j.proximo_partido !== true);
 
             if (jornadasFiltradas.length === 0) {
                 jornadasContainer.innerHTML = '<p class="text-gray-400 col-span-full text-center py-10">Aún no hay partidos en esta temporada.</p>';
@@ -367,7 +367,10 @@
                         </div>
                     `;
                 }
-
+                let horaHTML =
+                    `<div class="mb-3 flex items-center justify-between text-xs bg-white/5 p-2 rounded-lg border border-white/10">
+                    <span class="flex items-center gap-1.5"><svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>${partido.hora}</span>   
+                    </div>`
                 const card = document.createElement("div");
                 card.className = "glass-card rounded-xl overflow-hidden hover:-translate-y-1 transition duration-300 flex flex-col h-full border border-gray-700/50";
 
@@ -382,6 +385,7 @@
                         </h3>
                         
                         ${lugarHTML}
+                        ${horaHTML}
                         
                         <div class="bg-black/40 rounded-lg p-2 mt-4">
                             <h4 class="text-[9px] text-gray-500 uppercase font-bold mb-1.5 tracking-wider">Goleadores</h4>
