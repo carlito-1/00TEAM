@@ -212,7 +212,7 @@
                         goles,
                         nombre_jugador
                     )
-                `).order('jornada', { ascending: false });
+                `).order('jornada', { ascending: true });
 
             if (error) {
                 console.error("Error cargando jornadas:", error);
@@ -290,7 +290,7 @@
 
             for (const temp of temporadasUnicas) {
                 // Filtramos para contar cuántos partidos hay en esta temporada que NO sean el próximo partido
-                const partidosJugados = todasLasJornadas.filter(j => j.temporada === temp && j.proximo_partido !== true);
+                const partidosJugados = todasLasJornadas.filter(j => j.temporada === temp);
 
                 if (partidosJugados.length > 0) {
                     temporadaPorDefecto = temp;
