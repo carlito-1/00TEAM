@@ -307,7 +307,7 @@
         function pintarJornadasPorTemporada(temporadaSeleccionada) {
             jornadasContainer.innerHTML = "";
             // Filtramos por temporada Y le decimos que ignore el que está marcado como próximo partido
-            const jornadasFiltradas = todasLasJornadas.filter(j => j.temporada === temporadaSeleccionada && j.proximo_partido !== true);
+            const jornadasFiltradas = todasLasJornadas.filter(j => j.temporada === temporadaSeleccionada);
 
             if (jornadasFiltradas.length === 0) {
                 jornadasContainer.innerHTML = '<p class="text-gray-400 col-span-full text-center py-10">Aún no hay partidos en esta temporada.</p>';
