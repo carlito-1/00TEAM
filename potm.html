@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MVP del Mes - 00TEAM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #0b132b;
+            background-image: radial-gradient(circle at top right, #1c2541, #0b132b);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .gold-gradient {
+            background: linear-gradient(135deg, #facc15 0%, #d97706 100%);
+        }
+        
+        .text-gold {
+            background: linear-gradient(135deg, #facc15 0%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Animación para el PopUp */
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95) translate(-50%, -50%); } to { opacity: 1; transform: scale(1) translate(-50%, -50%); } }
+        .modal-anim { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
+</head>
+
+<body class="p-4 md:p-8 relative">
+
+    <!-- Efecto visual de fondo -->
+    <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-yellow-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
+
+    <div class="max-w-5xl mx-auto relative z-10">
+
+        <!-- ENCABEZADO -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='index.html'" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition border border-white/20">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight uppercase">MVP <span class="text-gold">DEL MES</span></h1>
+                    <p class="text-sm text-gray-400 font-medium">Vota al mejor jugador de este mes</p>
+                </div>
+            </div>
+            <div id="estadoVoto" class="hidden bg-green-500/20 border border-green-500/50 text-green-400 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Ya has votado este mes
+            </div>
+        </header>
+
+        <!-- CONTENEDOR DE NOMINADOS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="nominadosContainer">
+            <!-- Las tarjetas se inyectan por JS -->
+        </div>
+
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN (Oculto por defecto) -->
+    <div id="modalConfirmacion" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm">
+        <div class="modal-anim absolute top-1/2 left-1/2 w-[90%] max-w-sm glass-card p-6 rounded-2xl border border-yellow-400/30 text-center shadow-2xl">
+            <div class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-yellow-400/50">
+                <span class="text-2xl">🏆</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Confirmar Voto</h3>
+            <p class="text-sm text-gray-300 mb-6">¿Estás seguro de que quieres dar tu voto a <span id="nombreVoto" class="font-bold text-yellow-400"></span>? Esta acción no se puede deshacer.</p>
+            
+            <div class="flex gap-3 justify-center">
+                <button onclick="cerrarModal()" class="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-2.5 rounded-lg transition border border-white/20 text-sm">
+                    Cancelar
+                </button>
+                <button id="btnConfirmarVoto" class="flex-1 gold-gradient hover:opacity-90 text-[#0b132b] font-bold py-2.5 rounded-lg transition text-sm shadow-[0_0_15px_rgba(250,204,21,0.4)]">
+                    Sí, Votar
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="basededatos.js"></script>
+    <script>
+      let jugadorSeleccionadoParaVotar = null;
+
+        // 2. FUNCIÓN PARA PINTAR LAS TARJETAS
+        // 2. FUNCIÓN PARA PINTAR LAS TARJETAS
+        async function pintarNominados() {
+            const { data: datos_potm, error } = await clienteSupabase
+                .from('datos_potm') 
+                .select(`
+                    nombre, 
+                    partido,
+                    goles,
+                    asistencias
+                `);
+
+            const container = document.getElementById("nominadosContainer");
+            
+            // PROTECCIÓN: Si hay error
+            if (error) {
+                console.error("Error al cargar nominados:", error);
+                container.innerHTML = '<p class="text-red-500 text-center col-span-3">Error al cargar los nominados.</p>';
+                return;
+            }
+
+            // --- LÓGICA DE AGRUPACIÓN (TOTALES + HISTORIAL) ---
+            const jugadoresAgrupados = {};
+
+            datos_potm.forEach(registro => {
+                const nombre = registro.nombre;
+                
+                // Si el jugador no existe, lo creamos con contadores a 0 y lista vacía
+                if (!jugadoresAgrupados[nombre]) {
+                    jugadoresAgrupados[nombre] = {
+                        nombre: nombre,
+                        golesTotales: 0,       // <-- VARIABLE PARA GOLES TOTALES
+                        asistenciasTotales: 0, // <-- VARIABLE PARA ASISTENCIAS TOTALES
+                        historial: [] 
+                    };
+                }
+                
+                // 1. Sumamos a los totales
+                jugadoresAgrupados[nombre].golesTotales += (registro.goles || 0);
+                jugadoresAgrupados[nombre].asistenciasTotales += (registro.asistencias || 0);
+
+                // 2. Guardamos el partido individual
+                jugadoresAgrupados[nombre].historial.push({
+                    rival: registro.partido || 'Desconocido',
+                    goles: registro.goles || 0,
+                    asistencias: registro.asistencias || 0
+                });
+            });
+
+            // Convertimos a array para pintarlo
+            const nominadosFinales = Object.values(jugadoresAgrupados);
+            // ------------------------------------------------------
+
+            const yaVotado = comprobarCookie("votoMVP");
+
+            if (yaVotado) {
+                document.getElementById("estadoVoto").classList.remove("hidden");
+            }
+            
+            // Ahora pintamos a los jugadores
+            nominadosFinales.forEach(jugador => {
+                
+                // Fabricamos las líneas de su historial de partidos
+                let desgloseHTML = "";
+                jugador.historial.forEach(p => {
+                    desgloseHTML += `
+                        <li class="flex justify-between items-center py-2 border-b border-gray-700/50 last:border-0">
+                            <span class="text-xs font-medium text-gray-300 truncate pr-2 w-[55%]">Vs ${p.rival}</span>
+                            <div class="flex gap-1.5 w-[45%] justify-end">
+                                <span class="text-[10px] font-bold bg-white/10 px-1.5 py-0.5 rounded text-white flex items-center gap-1">⚽ ${p.goles}</span>
+                                <span class="text-[10px] font-bold bg-white/10 px-1.5 py-0.5 rounded text-white flex items-center gap-1">👟 ${p.asistencias}</span>
+                            </div>
+                        </li>
+                    `;
+                });
+
+                // Preparamos la tarjeta
+                const card = document.createElement("div");
+                card.className = "glass-card rounded-2xl overflow-hidden flex flex-col relative group hover:-translate-y-2 transition duration-300 border-t-2 border-t-white/10 hover:border-t-yellow-400";
+                
+                const estadoBoton = yaVotado 
+                    ? `<button disabled class="w-full bg-white/5 text-gray-500 font-bold py-3 uppercase tracking-wider text-xs cursor-not-allowed">Voto Registrado</button>`
+                    : `<button onclick="abrirModal('${jugador.nombre}')" class="w-full gold-gradient text-[#0b132b] font-bold py-3 uppercase tracking-wider text-sm hover:opacity-90 transition">Votar a ${jugador.nombre}</button>`;
+
+                card.innerHTML = `
+                    <!-- Imagen y Nombre -->
+                    <div class="relative pt-8 pb-4 flex flex-col items-center bg-gradient-to-b from-black/40 to-transparent">
+                        <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-[#1c2541] shadow-[0_0_20px_rgba(250,204,21,0.2)] mb-3 relative z-10 group-hover:scale-105 transition">
+                            <img src="public/${jugador.nombre}.png" alt="${jugador.nombre}" class="w-full h-full object-cover">
+                        </div>
+                        <h2 class="text-xl font-black uppercase tracking-widest text-white">${jugador.nombre}</h2>
+                        <span class="text-[10px] text-yellow-400 font-bold tracking-widest uppercase">Nominado</span>
+                    </div>
+
+                    <!-- Estadísticas Detalladas -->
+                    <div class="px-6 py-4 flex-grow flex flex-col">
+                        
+                        <!-- Caja de TOTALES -->
+                        <div class="grid grid-cols-2 gap-2 text-center bg-black/40 rounded-t-xl p-3 border border-white/5 border-b-0">
+                            <div>
+                                <p class="text-[9px] text-gray-400 uppercase font-bold mb-1">Goles Totales</p>
+                                <p class="text-xl font-black text-yellow-400">${jugador.golesTotales}</p>
+                            </div>
+                            <div class="border-l border-white/10">
+                                <p class="text-[9px] text-gray-400 uppercase font-bold mb-1">Asistencias Totales</p>
+                                <p class="text-xl font-black text-yellow-400">${jugador.asistenciasTotales}</p>
+                            </div>
+                        </div>
+
+                        <!-- Caja de HISTORIAL DE PARTIDOS -->
+                        <div class="bg-black/20 rounded-b-xl p-3 border border-white/5 border-t-0 flex-grow">
+                            <h4 class="text-[8px] text-gray-500 uppercase font-bold mb-2 tracking-wider text-center border-b border-white/5 pb-2">Detalles de los partidos</h4>
+                            <ul class="m-0 p-0">
+                                ${desgloseHTML}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Botón de Votar -->
+                    <div class="mt-auto">
+                        ${estadoBoton}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 3. LÓGICA DEL MODAL
+        const modal = document.getElementById("modalConfirmacion");
+        const spanNombre = document.getElementById("nombreVoto");
+        const btnConfirmar = document.getElementById("btnConfirmarVoto");
+
+        function abrirModal(nombreJugador) {
+            jugadorSeleccionadoParaVotar = nombreJugador;
+            spanNombre.textContent = nombreJugador;
+            modal.classList.remove("hidden");
+        }
+
+        function cerrarModal() {
+            jugadorSeleccionadoParaVotar = null;
+            modal.classList.add("hidden");
+        }
+
+        btnConfirmar.addEventListener("click", async () => {
+            if (jugadorSeleccionadoParaVotar) {
+                
+                btnConfirmar.textContent = "Votando...";
+                btnConfirmar.disabled = true;
+
+                // INSERT (Mantengo la tabla 'potm' que tenías en tu código)
+                const { error } = await clienteSupabase
+                    .from('potm')
+                    .insert([
+                        { nombre: jugadorSeleccionadoParaVotar }
+                    ]);
+
+                if (error) {
+                    console.error("Error al guardar el voto:", error);
+                    alert("Hubo un error al registrar tu voto. Inténtalo de nuevo.");
+                    btnConfirmar.textContent = "Sí, Votar";
+                    btnConfirmar.disabled = false;
+                    return;
+                }
+                
+                crearCookie("votoMVP", "true", 6);
+                cerrarModal();
+                window.location.reload();
+            }
+        });
+
+        // 4. SISTEMA DE COOKIES
+        function crearCookie(nombre, valor, dias) {
+            const fecha = new Date();
+            fecha.setTime(fecha.getTime() + (dias * 24 * 60 * 60 * 1000));
+            const expiracion = "expires=" + fecha.toUTCString();
+            document.cookie = nombre + "=" + valor + ";" + expiracion + ";path=/";
+        }
+
+        function comprobarCookie(nombre) {
+            const nombreC = nombre + "=";
+            const cookiesDecodificadas = decodeURIComponent(document.cookie);
+            const arrayCookies = cookiesDecodificadas.split(';');
+            for(let i = 0; i < arrayCookies.length; i++) {
+                let c = arrayCookies[i];
+                while (c.charAt(0) == ' ') { c = c.substring(1); }
+                if (c.indexOf(nombreC) == 0) { return true; }
+            }
+            return false;
+        }
+
+        // INICIAR
+        pintarNominados();
+    </script>
+</body>
+</html>
