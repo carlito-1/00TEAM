@@ -7,6 +7,8 @@
     <title>MVP del Mes - 00TEAM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!-- Librería para el efecto de confeti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -33,9 +35,12 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Animación para el PopUp */
+        /* Animación para el PopUp y el ganador */
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95) translate(-50%, -50%); } to { opacity: 1; transform: scale(1) translate(-50%, -50%); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.5); } 80% { transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+        
         .modal-anim { animation: fadeIn 0.3s ease-out forwards; }
+        .winner-anim { animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
     </style>
 </head>
 
@@ -44,17 +49,17 @@
     <!-- Efecto visual de fondo -->
     <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-yellow-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
-    <div class="max-w-5xl mx-auto relative z-10">
+    <div class="max-w-5xl mx-auto relative z-10" id="mainContent">
 
         <!-- ENCABEZADO -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
+        <header id="headerVotacion" class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
             <div class="flex items-center gap-4">
                 <button onclick="window.location.href='index.html'" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition border border-white/20">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
                 </button>
                 <div>
                     <h1 class="text-3xl font-extrabold tracking-tight uppercase">MVP <span class="text-gold">DEL MES</span></h1>
-                    <p class="text-sm text-gray-400 font-medium">Vota al mejor jugador de este mes</p>
+                    <p class="text-sm text-gray-400 font-medium" id="subtituloHeader">Vota al mejor jugador de este mes</p>
                 </div>
             </div>
             <div id="estadoVoto" class="hidden bg-green-500/20 border border-green-500/50 text-green-400 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
@@ -89,21 +94,57 @@
             </div>
         </div>
     </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="basededatos.js"></script>
     <script>
-      let jugadorSeleccionadoParaVotar = null;
+        let jugadorSeleccionadoParaVotar = null;
 
-        // 2. FUNCIÓN PARA PINTAR LAS TARJETAS
-        // 2. FUNCIÓN PARA PINTAR LAS TARJETAS
+        // FUNCIÓN PARA LANZAR CONFETI
+       // FUNCIÓN PARA LANZAR CONFETI DORADO INFINITO
+        function lanzarConfeti() {
+            // Definimos una paleta exclusiva de dorados, amarillos y blanco brillante
+            var coloresDorados = ['#facc15', '#d97706', '#fbbf24', '#fef3c7', '#ffffff'];
+            
+            var defaults = { 
+                startVelocity: 30, 
+                spread: 360, 
+                ticks: 60, 
+                zIndex: 0,
+                colors: coloresDorados // Le decimos que SOLO use estos colores
+            };
+
+            function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
+            // Quitamos el límite de tiempo, esto se ejecutará para siempre (hasta que cierres la página)
+            setInterval(function() {
+                var particleCount = 20; // Mantenemos un flujo constante y elegante
+                
+                // Disparo desde la izquierda
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } 
+                }));
+                
+                // Disparo desde la derecha
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } 
+                }));
+            }, 250);
+        }
+
+        // 2. FUNCIÓN PARA PINTAR LAS TARJETAS (O AL GANADOR)
         async function pintarNominados() {
+            // 1. Traemos los nominados (AÑADIMOS 'ganador')
             const { data: datos_potm, error } = await clienteSupabase
                 .from('datos_potm') 
                 .select(`
                     nombre, 
                     partido,
                     goles,
-                    asistencias
+                    asistencias,
+                    ganador
                 `);
 
             const container = document.getElementById("nominadosContainer");
@@ -115,48 +156,111 @@
                 return;
             }
 
-            // --- LÓGICA DE AGRUPACIÓN (TOTALES + HISTORIAL) ---
-            const jugadoresAgrupados = {};
+            // 2. Traemos todos los votos reales para contar
+            const { data: votosReales } = await clienteSupabase.from('potm').select('nombre');
+            
+            const conteoVotos = {};
+            let totalVotosEmitidos = 0;
+            if (votosReales) {
+                votosReales.forEach(voto => {
+                    conteoVotos[voto.nombre] = (conteoVotos[voto.nombre] || 0) + 1;
+                    totalVotosEmitidos++;
+                });
+            }
 
+            // --- LÓGICA DE AGRUPACIÓN PARA EL HISTORIAL ---
+           // --- LÓGICA DE AGRUPACIÓN PARA EL HISTORIAL ---
+            const jugadoresAgrupados = {};
             datos_potm.forEach(registro => {
                 const nombre = registro.nombre;
-                
-                // Si el jugador no existe, lo creamos con contadores a 0 y lista vacía
                 if (!jugadoresAgrupados[nombre]) {
                     jugadoresAgrupados[nombre] = {
                         nombre: nombre,
-                        golesTotales: 0,       // <-- VARIABLE PARA GOLES TOTALES
-                        asistenciasTotales: 0, // <-- VARIABLE PARA ASISTENCIAS TOTALES
+                        golesTotales: 0,
+                        asistenciasTotales: 0,
+                        ganador: false, // Por defecto en falso
                         historial: [] 
                     };
                 }
                 
-                // 1. Sumamos a los totales
+                // ¡LA MAGIA! Si cualquiera de sus filas dice "true", lo coronamos ganador
+                if (registro.ganador === true) {
+                    jugadoresAgrupados[nombre].ganador = true;
+                }
+                
                 jugadoresAgrupados[nombre].golesTotales += (registro.goles || 0);
                 jugadoresAgrupados[nombre].asistenciasTotales += (registro.asistencias || 0);
-
-                // 2. Guardamos el partido individual
                 jugadoresAgrupados[nombre].historial.push({
                     rival: registro.partido || 'Desconocido',
                     goles: registro.goles || 0,
                     asistencias: registro.asistencias || 0
                 });
             });
+                
+                
 
-            // Convertimos a array para pintarlo
             const nominadosFinales = Object.values(jugadoresAgrupados);
-            // ------------------------------------------------------
+            
+            // --- COMPROBAR SI HAY GANADOR ---
+            const jugadorGanador = nominadosFinales.find(j => j.ganador === true);
 
+            if (jugadorGanador) {
+                // Hay ganador: Cambiamos el diseño
+                document.getElementById("headerVotacion").style.display = "none";
+                container.className = "flex flex-col items-center justify-center min-h-[70vh] text-center w-full";
+
+                // Preparar la tabla de estadísticas de votos
+                // Ordenamos a los nominados de más a menos votos
+                const ranking = nominadosFinales.sort((a, b) => (conteoVotos[b.nombre] || 0) - (conteoVotos[a.nombre] || 0));
+                
+                let estadisticasHTML = `<div class="mt-12 bg-black/40 p-6 rounded-2xl border border-white/10 w-full max-w-lg glass-card shadow-xl">`;
+                estadisticasHTML += `<h4 class="text-yellow-400 font-bold mb-4 uppercase tracking-wider text-sm flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg> Resultados Finales (${totalVotosEmitidos} votos)</h4>`;
+                
+                ranking.forEach(candidato => {
+                    const votos = conteoVotos[candidato.nombre] || 0;
+                    const esElGanador = candidato.nombre === jugadorGanador.nombre;
+                    estadisticasHTML += `
+                        <div class="flex justify-between items-center py-3 border-b border-white/5 last:border-0">
+                            <span class="${esElGanador ? 'text-yellow-400 font-black text-lg' : 'text-gray-300 font-semibold'}">${candidato.nombre}</span>
+                            <span class="${esElGanador ? 'bg-yellow-400 text-[#0b132b] shadow-[0_0_10px_rgba(250,204,21,0.5)]' : 'bg-white/10 text-white'} px-3 py-1 rounded-md text-xs font-bold">${votos} votos</span>
+                        </div>
+                    `;
+                });
+                estadisticasHTML += `</div>`;
+
+                // Pintar pantalla de victoria
+                container.innerHTML = `
+                    <div class="winner-anim flex flex-col items-center w-full">
+                        <button onclick="window.location.href='index.html'" class="absolute top-0 left-0 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition border border-white/20">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        
+                        <h4 class="text-lg md:text-xl font-bold text-gray-400 uppercase tracking-[0.3em] mb-2">Votaciones cerradas</h4>
+                        <h2 class="text-5xl md:text-7xl font-black text-gold mb-8 uppercase tracking-tight animate-pulse" style="text-shadow: 0 0 30px rgba(250,204,21,0.3);">MVP DEL MES</h2>
+                        
+                        <div class="w-56 h-56 md:w-72 md:h-72 rounded-full overflow-hidden border-8 border-yellow-400 shadow-[0_0_80px_rgba(250,204,21,0.6)] mb-6 relative z-10 bg-[#1c2541]">
+                            <img src="public/${jugadorGanador.nombre.toLowerCase()}.png" alt="${jugadorGanador.nombre}" class="w-full h-full object-cover">
+                        </div>
+                        
+                        <h3 class="text-4xl md:text-6xl font-black text-white uppercase tracking-widest mb-2">${jugadorGanador.nombre}</h3>
+                        
+                        ${estadisticasHTML}
+                    </div>
+                `;
+
+                lanzarConfeti();
+                return; // Paramos aquí, no pintamos las tarjetas
+            }
+
+            // --- SI NO HAY GANADOR, PINTAMOS LAS TARJETAS NORMALES ---
             const yaVotado = comprobarCookie("votoMVP");
 
             if (yaVotado) {
                 document.getElementById("estadoVoto").classList.remove("hidden");
             }
             
-            // Ahora pintamos a los jugadores
             nominadosFinales.forEach(jugador => {
                 
-                // Fabricamos las líneas de su historial de partidos
                 let desgloseHTML = "";
                 jugador.historial.forEach(p => {
                     desgloseHTML += `
@@ -170,7 +274,6 @@
                     `;
                 });
 
-                // Preparamos la tarjeta
                 const card = document.createElement("div");
                 card.className = "glass-card rounded-2xl overflow-hidden flex flex-col relative group hover:-translate-y-2 transition duration-300 border-t-2 border-t-white/10 hover:border-t-yellow-400";
                 
@@ -179,19 +282,15 @@
                     : `<button onclick="abrirModal('${jugador.nombre}')" class="w-full gold-gradient text-[#0b132b] font-bold py-3 uppercase tracking-wider text-sm hover:opacity-90 transition">Votar a ${jugador.nombre}</button>`;
 
                 card.innerHTML = `
-                    <!-- Imagen y Nombre -->
                     <div class="relative pt-8 pb-4 flex flex-col items-center bg-gradient-to-b from-black/40 to-transparent">
                         <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-[#1c2541] shadow-[0_0_20px_rgba(250,204,21,0.2)] mb-3 relative z-10 group-hover:scale-105 transition">
-                            <img src="public/${jugador.nombre}.png" alt="${jugador.nombre}" class="w-full h-full object-cover">
+                            <img src="public/${jugador.nombre.toLowerCase()}.png" alt="${jugador.nombre}" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=${jugador.nombre}&background=facc15&color=0b132b&size=150'">
                         </div>
                         <h2 class="text-xl font-black uppercase tracking-widest text-white">${jugador.nombre}</h2>
                         <span class="text-[10px] text-yellow-400 font-bold tracking-widest uppercase">Nominado</span>
                     </div>
 
-                    <!-- Estadísticas Detalladas -->
                     <div class="px-6 py-4 flex-grow flex flex-col">
-                        
-                        <!-- Caja de TOTALES -->
                         <div class="grid grid-cols-2 gap-2 text-center bg-black/40 rounded-t-xl p-3 border border-white/5 border-b-0">
                             <div>
                                 <p class="text-[9px] text-gray-400 uppercase font-bold mb-1">Goles Totales</p>
@@ -203,7 +302,6 @@
                             </div>
                         </div>
 
-                        <!-- Caja de HISTORIAL DE PARTIDOS -->
                         <div class="bg-black/20 rounded-b-xl p-3 border border-white/5 border-t-0 flex-grow">
                             <h4 class="text-[8px] text-gray-500 uppercase font-bold mb-2 tracking-wider text-center border-b border-white/5 pb-2">Detalles de los partidos</h4>
                             <ul class="m-0 p-0">
@@ -212,7 +310,6 @@
                         </div>
                     </div>
 
-                    <!-- Botón de Votar -->
                     <div class="mt-auto">
                         ${estadoBoton}
                     </div>
@@ -243,7 +340,6 @@
                 btnConfirmar.textContent = "Votando...";
                 btnConfirmar.disabled = true;
 
-                // INSERT (Mantengo la tabla 'potm' que tenías en tu código)
                 const { error } = await clienteSupabase
                     .from('potm')
                     .insert([
