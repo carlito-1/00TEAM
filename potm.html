@@ -135,8 +135,9 @@
         }
 
         // 2. FUNCIÓN PARA PINTAR LAS TARJETAS (O AL GANADOR)
+        // 2. FUNCIÓN PARA PINTAR LAS TARJETAS (O AL GANADOR)
         async function pintarNominados() {
-            // 1. Traemos los nominados (AÑADIMOS 'ganador')
+            // Traemos los datos de la base de datos (con tu columna 'mvps')
             const { data: datos_potm, error } = await clienteSupabase
                 .from('datos_potm') 
                 .select(`
@@ -144,19 +145,19 @@
                     partido,
                     goles,
                     asistencias,
-                    ganador
+                    ganador,
+                    mvps
                 `);
 
             const container = document.getElementById("nominadosContainer");
             
-            // PROTECCIÓN: Si hay error
             if (error) {
                 console.error("Error al cargar nominados:", error);
                 container.innerHTML = '<p class="text-red-500 text-center col-span-3">Error al cargar los nominados.</p>';
                 return;
             }
 
-            // 2. Traemos todos los votos reales para contar
+            // Traemos todos los votos reales para contar
             const { data: votosReales } = await clienteSupabase.from('potm').select('nombre');
             
             const conteoVotos = {};
@@ -169,35 +170,37 @@
             }
 
             // --- LÓGICA DE AGRUPACIÓN PARA EL HISTORIAL ---
-           // --- LÓGICA DE AGRUPACIÓN PARA EL HISTORIAL ---
             const jugadoresAgrupados = {};
             datos_potm.forEach(registro => {
                 const nombre = registro.nombre;
                 if (!jugadoresAgrupados[nombre]) {
                     jugadoresAgrupados[nombre] = {
                         nombre: nombre,
+                        partidos_totales: 0,
                         golesTotales: 0,
                         asistenciasTotales: 0,
-                        ganador: false, // Por defecto en falso
+                        mvps_totales: 0,
+                        ganador: false,
                         historial: [] 
                     };
                 }
                 
-                // ¡LA MAGIA! Si cualquiera de sus filas dice "true", lo coronamos ganador
                 if (registro.ganador === true) {
                     jugadoresAgrupados[nombre].ganador = true;
                 }
                 
+                jugadoresAgrupados[nombre].mvps_totales += (registro.mvps || 0);
+                jugadoresAgrupados[nombre].partidos_totales += 1;
                 jugadoresAgrupados[nombre].golesTotales += (registro.goles || 0);
                 jugadoresAgrupados[nombre].asistenciasTotales += (registro.asistencias || 0);
+                
                 jugadoresAgrupados[nombre].historial.push({
                     rival: registro.partido || 'Desconocido',
                     goles: registro.goles || 0,
-                    asistencias: registro.asistencias || 0
+                    asistencias: registro.asistencias || 0,
+                    mvps: registro.mvps || 0 // <-- Guardado con 's'
                 });
             });
-                
-                
 
             const nominadosFinales = Object.values(jugadoresAgrupados);
             
@@ -205,12 +208,9 @@
             const jugadorGanador = nominadosFinales.find(j => j.ganador === true);
 
             if (jugadorGanador) {
-                // Hay ganador: Cambiamos el diseño
                 document.getElementById("headerVotacion").style.display = "none";
                 container.className = "flex flex-col items-center justify-center min-h-[70vh] text-center w-full";
 
-                // Preparar la tabla de estadísticas de votos
-                // Ordenamos a los nominados de más a menos votos
                 const ranking = nominadosFinales.sort((a, b) => (conteoVotos[b.nombre] || 0) - (conteoVotos[a.nombre] || 0));
                 
                 let estadisticasHTML = `<div class="mt-12 bg-black/40 p-6 rounded-2xl border border-white/10 w-full max-w-lg glass-card shadow-xl">`;
@@ -228,7 +228,6 @@
                 });
                 estadisticasHTML += `</div>`;
 
-                // Pintar pantalla de victoria
                 container.innerHTML = `
                     <div class="winner-anim flex flex-col items-center w-full">
                         <button onclick="window.location.href='index.html'" class="absolute top-0 left-0 w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition border border-white/20">
@@ -249,7 +248,7 @@
                 `;
 
                 lanzarConfeti();
-                return; // Paramos aquí, no pintamos las tarjetas
+                return;
             }
 
             // --- SI NO HAY GANADOR, PINTAMOS LAS TARJETAS NORMALES ---
@@ -263,12 +262,18 @@
                 
                 let desgloseHTML = "";
                 jugador.historial.forEach(p => {
+                    
+                    // ¡AQUÍ ESTABA EL FALLO! Tiene que ser p.mvps > 0
+                    const etiquetaMVP = p.mvps > 0 
+                        ? `<span class="ml-2 text-[9px] bg-yellow-400/20 text-yellow-400 px-1.5 py-0.5 rounded border border-yellow-400/40 font-bold tracking-wider">⭐ ${p.mvps} MVP</span>` 
+                        : '';
+                    
                     desgloseHTML += `
                         <li class="flex justify-between items-center py-2 border-b border-gray-700/50 last:border-0">
-                            <span class="text-xs font-medium text-gray-300 truncate pr-2 w-[55%]">Vs ${p.rival}</span>
+                            <span class="text-xs font-medium text-gray-300 truncate pr-2 w-[55%]">Vs ${p.rival} ${etiquetaMVP}</span>
                             <div class="flex gap-1.5 w-[45%] justify-end">
-                                <span class="text-[10px] font-bold bg-white/10 px-1.5 py-0.5 rounded text-white flex items-center gap-1">⚽ ${p.goles}</span>
-                                <span class="text-[10px] font-bold bg-white/10 px-1.5 py-0.5 rounded text-white flex items-center gap-1">👟 ${p.asistencias}</span>
+                                <span class="text-[15px] font-bold bg-white/10 px-1.5 py-0.5 rounded text-white flex items-center gap-1">⚽ ${p.goles}</span>
+                                <span class="text-[15px] font-bold bg-white/10 px-1.5 py-0.5 rounded text-white flex items-center gap-1">👟 ${p.asistencias}</span>
                             </div>
                         </li>
                     `;
@@ -291,14 +296,24 @@
                     </div>
 
                     <div class="px-6 py-4 flex-grow flex flex-col">
-                        <div class="grid grid-cols-2 gap-2 text-center bg-black/40 rounded-t-xl p-3 border border-white/5 border-b-0">
+                        
+                        <!-- ¡AQUÍ ESTABA EL SEGUNDO FALLO! Faltaba la 4ª columna -->
+                        <div class="grid grid-cols-4 gap-1 text-center bg-black/40 rounded-t-xl p-2 border border-white/5 border-b-0">
                             <div>
-                                <p class="text-[9px] text-gray-400 uppercase font-bold mb-1">Goles Totales</p>
-                                <p class="text-xl font-black text-yellow-400">${jugador.golesTotales}</p>
+                                <p class="text-[8px] text-gray-400 uppercase font-bold mb-1">Partidos</p>
+                                <p class="text-lg font-black text-white">${jugador.partidos_totales}</p>
                             </div>
                             <div class="border-l border-white/10">
-                                <p class="text-[9px] text-gray-400 uppercase font-bold mb-1">Asistencias Totales</p>
-                                <p class="text-xl font-black text-yellow-400">${jugador.asistenciasTotales}</p>
+                                <p class="text-[8px] text-gray-400 uppercase font-bold mb-1">Goles</p>
+                                <p class="text-lg font-black text-yellow-400">${jugador.golesTotales}</p>
+                            </div>
+                            <div class="border-l border-white/10">
+                                <p class="text-[8px] text-gray-400 uppercase font-bold mb-1">Asist.</p>
+                                <p class="text-lg font-black text-yellow-400">${jugador.asistenciasTotales}</p>
+                            </div>
+                            <div class="border-l border-white/10">
+                                <p class="text-[8px] text-gray-400 uppercase font-bold mb-1">MVPs</p>
+                                <p class="text-lg font-black text-yellow-400">${jugador.mvps_totales} ⭐</p>
                             </div>
                         </div>
 
