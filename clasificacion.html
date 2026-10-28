@@ -160,24 +160,83 @@
             tablaBody.innerHTML = "";
 
             equipos.forEach((equipo, index) => {
-                if (equipo.nombre_equipo == "00TEAM") {
-
-                }
                 const fila = document.createElement("tr");
 
                 // Si es el primero (Líder), le ponemos un color especial
                 const esLider = index === 0;
-                const bgFila = esLider ? "bg-yellow-400/10 font-bold" : "hover:bg-white/5 border-b border-gray-700/50";
-                const colorPosicion = esLider ? "text-yellow-400 text-lg" : "text-gray-400";
+                
+                // 1. Variables de estilo por defecto para cualquier equipo
+                let bgFila = esLider ? "bg-yellow-400/10 font-bold" : "hover:bg-white/5 border-b border-gray-700/50";
+                let colorPosicion = esLider ? "text-yellow-400 text-lg" : "text-gray-400";
+                let icono00Team = "";
+
+                // 2. ¡LA MAGIA! Si es 00TEAM, sobrescribimos los estilos
+                if (equipo.nombre_equipo == "00TEAM") {
+                    bgFila = "bg-yellow-400/20 border-y-2 border-yellow-400 shadow-[inset_0_0_15px_rgba(250,204,21,0.3)]";
+                    colorPosicion = "text-yellow-400 text-lg font-black";
+                    icono00Team = "⭐"; // Le ponemos la estrellita al lado
+                }
 
                 // Dar formato visual al + en la diferencia de goles
                 const difVisual = equipo.dif > 0 ? `+${equipo.dif}` : equipo.dif;
 
+                // 3. Aplicamos bgFila al className general
                 fila.className = `text-gray-300 transition duration-150 ${bgFila}`;
                 fila.innerHTML = `
                     <td class="py-3 px-4 ${colorPosicion}">${index + 1}</td>
                     <td class="py-3 px-4 text-left text-white font-semibold flex items-center gap-2">
-                        ${equipo.nombre_equipo} 
+                        ${icono00Team} ${equipo.nombre_equipo} 
+                        ${esLider ? '🏆' : ''}
+                    </td>
+                    <td class="py-3 px-4 font-bold text-yellow-400 text-base">${equipo.puntos}</td>
+                    <td class="py-3 px-4">${equipo.pj}</td>
+                    <td class="py-3 px-4 text-green-400 font-semibold">${equipo.pg}</td>
+                    <td class="py-3 px-4 text-gray-400">${equipo.pe}</td>
+                    <td class="py-3 px-4 text-red-400 font-semibold">${equipo.pp}</td>
+                    <td class="py-3 px-4">${equipo.gf}</td>
+                    <td class="py-3 px-4">${equipo.gc}</td>
+                    <td class="py-3 px-4 font-medium">${difVisual}</td>
+                `;
+                tablaBody.appendChild(fila);
+            });
+        }function cargarTabla(temporada) {
+            // Filtramos los equipos de esa temporada
+            let equipos = todaLaClasificacion.filter(e => e.temporada === temporada);
+
+            // Calculamos la diferencia de goles y ordenamos
+            equipos.forEach(e => e.dif = (e.gf || 0) - (e.gc || 0));
+            // Ordena por puntos (mayor a menor) y, en caso de empate, por diferencia de goles
+            equipos.sort((a, b) => b.puntos - a.puntos || b.dif - a.dif);
+
+            tablaBody.innerHTML = "";
+
+            equipos.forEach((equipo, index) => {
+                const fila = document.createElement("tr");
+
+                // Si es el primero (Líder), le ponemos un color especial
+                const esLider = index === 0;
+                
+                // 1. Variables de estilo por defecto para cualquier equipo
+                let bgFila = esLider ? "bg-yellow-400/10 font-bold" : "hover:bg-white/5 border-b border-gray-700/50";
+                let colorPosicion = esLider ? "text-yellow-400 text-lg" : "text-gray-400";
+                let icono00Team = "";
+
+                // 2. ¡LA MAGIA! Si es 00TEAM, sobrescribimos los estilos
+                if (equipo.nombre_equipo == "00TEAM") {
+                    bgFila = "bg-yellow-400/20 border-y-2 border-yellow-400 shadow-[inset_0_0_15px_rgba(250,204,21,0.3)]";
+                    colorPosicion = "text-yellow-400 text-lg font-black";
+                    icono00Team = "⭐"; // Le ponemos la estrellita al lado
+                }
+
+                // Dar formato visual al + en la diferencia de goles
+                const difVisual = equipo.dif > 0 ? `+${equipo.dif}` : equipo.dif;
+
+                // 3. Aplicamos bgFila al className general
+                fila.className = `text-gray-300 transition duration-150 ${bgFila}`;
+                fila.innerHTML = `
+                    <td class="py-3 px-4 ${colorPosicion}">${index + 1}</td>
+                    <td class="py-3 px-4 text-left text-white font-semibold flex items-center gap-2">
+                        ${icono00Team} ${equipo.nombre_equipo} 
                         ${esLider ? '🏆' : ''}
                     </td>
                     <td class="py-3 px-4 font-bold text-yellow-400 text-base">${equipo.puntos}</td>
