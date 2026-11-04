@@ -49,113 +49,109 @@
 <body class="p-4 md:p-8">
 
     <!-- Efecto visual de fondo -->
-    <div
-        class="fixed top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-yellow-500/5 blur-[150px] rounded-full pointer-events-none z-0">
-    </div>
+    <div class="fixed top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-yellow-500/5 blur-[150px] rounded-full pointer-events-none z-0"></div>
 
-    <div class="max-w-5xl mx-auto relative z-10">
+    <div class="max-w-[1400px] mx-auto relative z-10"> <!-- Ampliado el max-w para que quepan las dos columnas cómodamente -->
 
         <!-- ENCABEZADO -->
-        <div
-            class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
-            <h1 class="text-3xl font-extrabold tracking-tight uppercase">Estadísticas de <span
-                    class="accent-gold">Jugadores</span></h1>
-            <button onclick="window.history.back()"
-                class="border border-gray-500 text-gray-300 px-5 py-2.5 rounded-lg hover:border-white hover:text-white transition uppercase text-sm tracking-wider font-bold">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
+            <h1 class="text-3xl font-extrabold tracking-tight uppercase">Estadísticas de <span class="accent-gold">Jugadores</span></h1>
+            <button onclick="window.history.back()" class="border border-gray-500 text-gray-300 px-5 py-2.5 rounded-lg hover:border-white hover:text-white transition uppercase text-sm tracking-wider font-bold">
                 Volver
             </button>
         </div>
 
         <!-- SELECTORES -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-5xl mx-auto">
             <!-- Temporada -->
             <div class="glass-card p-4 rounded-xl flex flex-col gap-2">
-                <label for="selectTemporada"
-                    class="text-xs font-bold text-gray-400 uppercase tracking-wider">Temporada:</label>
-                <select id="selectTemporada"
-                    class="bg-[#1c2541] border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
+                <label for="selectTemporada" class="text-xs font-bold text-gray-400 uppercase tracking-wider">Temporada:</label>
+                <select id="selectTemporada" class="bg-[#1c2541] border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
                     <option value="">Cargando...</option>
                 </select>
             </div>
 
             <!-- Jugador -->
             <div class="glass-card p-4 rounded-xl flex flex-col gap-2 border-yellow-400/30 border">
-                <label for="selectJugador"
-                    class="text-xs font-bold text-yellow-400 uppercase tracking-wider">Jugador:</label>
-                <select id="selectJugador"
-                    class="bg-[#1c2541] border border-yellow-500/50 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
+                <label for="selectJugador" class="text-xs font-bold text-yellow-400 uppercase tracking-wider">Jugador:</label>
+                <select id="selectJugador" class="bg-[#1c2541] border border-yellow-500/50 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
                     <option value="">Cargando...</option>
                 </select>
             </div>
         </div>
 
-        <!-- PERFIL DEL JUGADOR -->
-        <div id="perfilJugadorContainer"
-            class="glass-card rounded-2xl overflow-hidden hidden md:flex flex-col md:flex-row">
+        <!-- CONTENEDOR PRINCIPAL DIVIDIDO EN DOS (Oculto hasta que cargue un jugador) -->
+        <div id="mainDatosContainer" class="hidden grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
 
-            <!-- Foto -->
-            <div class="w-full md:w-2/5 bg-[#1c2541]/50 relative">
-                <!-- Dorsal gigante de fondo (decorativo) -->
-                <div id="dorsalFondo"
-                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[150px] font-black text-white/5 z-0 select-none">
-                    10</div>
+            <!-- MITAD IZQUIERDA: PERFIL DEL JUGADOR -->
+            <div class="glass-card rounded-2xl overflow-hidden flex flex-col sm:flex-row h-full">
 
-                <img id="fotoJugador" class="w-full h-80 md:h-full object-cover object-top relative z-10"
-                    src="https://via.placeholder.com/400x500/1c2541/ffffff?text=Sin+Foto" alt="Foto del Jugador" />
-            </div>
+                <!-- Foto -->
+                <div class="w-full sm:w-2/5 bg-[#1c2541]/50 relative flex-shrink-0">
+                    <!-- Dorsal gigante de fondo (decorativo) -->
+                    <div id="dorsalFondo" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[150px] font-black text-white/5 z-0 select-none">10</div>
+                    <img id="fotoJugador" class="w-full h-80 sm:h-full object-cover object-top relative z-10 min-h-[400px]" src="https://via.placeholder.com/400x500/1c2541/ffffff?text=Sin+Foto" alt="Foto del Jugador" />
+                </div>
 
-            <!-- Información y Stats -->
-            <div class="w-full md:w-3/5 p-6 md:p-10 flex flex-col justify-center">
+                <!-- Información y Stats -->
+                <div class="w-full sm:w-3/5 p-6 md:p-8 flex flex-col justify-center">
 
-                <div class="mb-8 border-b border-gray-700/50 pb-6">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h2 id="nombreJugador" class="text-4xl font-black uppercase text-white mb-2">Cargando...
-                            </h2>
-                            <p class="text-lg text-yellow-400 font-bold tracking-wide" id="posicionJugador">Posición</p>
-                        </div>
-                        <div class="bg-yellow-400 text-[#0b132b] w-12 h-12 flex items-center justify-center rounded-xl font-black text-xl shadow-[0_0_15px_rgba(250,204,21,0.4)]"
-                            id="dorsalJugador">
-                            -
+                    <div class="mb-8 border-b border-gray-700/50 pb-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 id="nombreJugador" class="text-3xl lg:text-4xl font-black uppercase text-white mb-2 truncate">Cargando...</h2>
+                                <p class="text-lg text-yellow-400 font-bold tracking-wide" id="posicionJugador">Posición</p>
+                            </div>
+                            <div class="bg-yellow-400 text-[#0b132b] w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-xl font-black text-xl shadow-[0_0_15px_rgba(250,204,21,0.4)]" id="dorsalJugador">
+                                -
+                            </div>
                         </div>
                     </div>
 
-                </div>
+                    <!-- Cuadrícula de Estadísticas -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
+                            <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Partidos</span>
+                            <span id="partidosJugador" class="text-2xl font-black text-white">0</span>
+                        </div>
 
-                <!-- Cuadrícula de Estadísticas -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div
-                        class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
-                        <span
-                            class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Partidos</span>
-                        <span id="partidosJugador" class="text-2xl font-black text-white">0</span>
-                    </div>
+                        <div class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
+                            <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Goles</span>
+                            <span id="golesJugador" class="text-2xl font-black text-green-400">0</span>
+                        </div>
 
-                    <div
-                        class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
-                        <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Goles</span>
-                        <span id="golesJugador" class="text-2xl font-black text-green-400">0</span>
-                    </div>
+                        <div class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
+                            <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Asistencias</span>
+                            <span id="asistenciasJugador" class="text-2xl font-black text-blue-400">0</span>
+                        </div>
 
-                    <div
-                        class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
-                        <span
-                            class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Asistencias</span>
-                        <span id="asistenciasJugador" class="text-2xl font-black text-blue-400">0</span>
-                    </div>
-
-                    <div
-                        class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition relative overflow-hidden">
-                        <!-- Efecto dorado para los MVPs -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent z-0"></div>
-                        <span
-                            class="block text-xs font-bold text-yellow-500/80 uppercase tracking-wider mb-1 relative z-10">MVPs
-                            🏆</span>
-                        <span id="mvpjugador" class="text-2xl font-black text-yellow-400 relative z-10">0</span>
+                        <div class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent z-0"></div>
+                            <span class="block text-xs font-bold text-yellow-500/80 uppercase tracking-wider mb-1 relative z-10">MVPs 🏆</span>
+                            <span id="mvpjugador" class="text-2xl font-black text-yellow-400 relative z-10">0</span>
+                        </div>
                     </div>
                 </div>
-
             </div>
+
+            <!-- MITAD DERECHA: HISTORIAL DE PARTIDOS -->
+            <div class="glass-card rounded-2xl flex flex-col h-full max-h-[550px] overflow-hidden">
+                <div class="p-6 md:p-8 pb-4 border-b border-gray-700/50 flex-shrink-0">
+                    <h3 class="text-xl lg:text-2xl font-black uppercase text-white tracking-wide">
+                        Historial de <span class="text-yellow-400">Partidos</span>
+                    </h3>
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mt-1">Desglose de actuaciones</p>
+                </div>
+                
+                <!-- Lista con Scroll -->
+                <div class="p-6 md:p-8 pt-4 overflow-y-auto flex-grow">
+                    <ul id="listaHistorial" class="m-0 p-0 space-y-3">
+                        <!-- Se inyecta por JS -->
+                        <li class="text-gray-400 text-sm italic text-center py-4">Selecciona un jugador para ver su historial...</li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
 
     </div>
@@ -164,21 +160,20 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="basededatos.js"></script>
 
-
     <script>
         const selectTemporada = document.getElementById("selectTemporada");
         const selectJugador = document.getElementById("selectJugador");
-        const perfilJugadorContainer = document.getElementById("perfilJugadorContainer");
+        const mainDatosContainer = document.getElementById("mainDatosContainer");
 
-        let todaLaData = []; // Aquí guardaremos todo lo que baje de Supabase
+        let todaLaData = []; 
         let jugadoresTemporadaActual = [];
 
-        // 1. CARGAR DATOS DE LA BASE DE DATOS
+        // 1. CARGAR DATOS GENERALES DE LA BASE DE DATOS
         async function cargarTodo() {
             const { data, error } = await clienteSupabase
                 .from('jugadores')
                 .select('*')
-                .order('nombre', { ascending: true }); // Ordenados alfabéticamente por defecto
+                .order('nombre', { ascending: true });
 
             if (error) {
                 console.error("Error al cargar estadísticas:", error);
@@ -186,13 +181,11 @@
                 return;
             }
 
-            // Limpiamos espacios en blanco de las temporadas
             todaLaData = data.map(j => ({
                 ...j,
                 temporada: j.temporada ? j.temporada.trim() : ''
             }));
 
-            // Extraemos las temporadas únicas
             const temporadasUnicas = [...new Set(todaLaData.map(j => j.temporada))].filter(Boolean);
             temporadasUnicas.sort().reverse();
 
@@ -210,7 +203,6 @@
                 selectTemporada.appendChild(option);
             });
 
-            // Cargamos los jugadores de la primera temporada
             actualizarJugadoresPorTemporada();
         }
 
@@ -219,7 +211,6 @@
             const temporadaSeleccionada = selectTemporada.value;
             jugadoresTemporadaActual = todaLaData.filter(j => j.temporada === temporadaSeleccionada);
 
-            // Guardamos el nombre del jugador actualmente seleccionado (si lo hay)
             const jugadorActualNombre = selectJugador.options[selectJugador.selectedIndex]?.textContent;
 
             selectJugador.innerHTML = "";
@@ -227,10 +218,9 @@
 
             jugadoresTemporadaActual.forEach((j) => {
                 const option = document.createElement("option");
-                option.value = j.id; // Usamos el ID real de la base de datos
+                option.value = j.id; 
                 option.textContent = j.nombre;
 
-                // Si este jugador se llama igual que el que teníamos seleccionado, lo mantenemos
                 if (j.nombre === jugadorActualNombre) {
                     option.selected = true;
                     jugadorASeleccionar = j;
@@ -242,44 +232,126 @@
             if (jugadorASeleccionar) {
                 mostrarJugador(jugadorASeleccionar);
             } else {
-                perfilJugadorContainer.classList.add("hidden");
-                perfilJugadorContainer.classList.remove("md:flex");
+                mainDatosContainer.classList.add("hidden");
             }
         }
 
-        // 3. MOSTRAR LOS DATOS EN LA PANTALLA
+        // 3. CARGAR EL HISTORIAL INDIVIDUAL DESDE datos_potm
+        // 3. CARGAR EL HISTORIAL INDIVIDUAL DESDE datos_individuales
+        async function cargarHistorialIndividual(nombreJugador) {
+            const lista = document.getElementById("listaHistorial");
+            lista.innerHTML = '<li class="text-gray-400 text-sm italic text-center py-4 flex justify-center items-center gap-2"><svg class="animate-spin h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Cargando partidos...</li>';
+
+            // Consultamos la NUEVA tabla
+            const { data, error } = await clienteSupabase
+                .from('datos_individuales')
+                .select('partido, resultado, goles, asistencias, jugado, razon, mvp')
+                .eq('nombre', nombreJugador);
+
+            if (error) {
+                console.error("Error al cargar el historial:", error);
+                lista.innerHTML = '<li class="text-red-400 text-sm font-bold text-center py-4">Error al cargar el historial.</li>';
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                lista.innerHTML = '<li class="text-gray-400 text-sm font-semibold text-center py-4 bg-black/20 rounded-xl">Ningún partido registrado aún.</li>';
+                return;
+            }
+
+            let html = "";
+            data.forEach(p => {
+                
+                // LÓGICA: Si NO ha jugado
+                if (p.jugado === false) {
+                    html += `
+                        <li class="flex justify-between items-center py-3 px-4 border border-red-500/30 rounded-xl bg-red-900/20 hover:bg-red-900/40 transition">
+                            <span class="text-xs md:text-sm font-semibold text-red-400/80 flex items-center truncate pr-2 w-[55%]">
+                                Vs ${p.partido || 'Desconocido'}
+                                <span class="ml-2 text-[9px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded tracking-wider border border-white/5">
+                                    ${p.resultado}
+                                </span>
+                            </span>
+                            <div class="flex w-[45%] justify-end">
+                                <span class="text-[10px] font-bold bg-red-500/20 border border-red-500/50 text-red-300 px-2 py-1 rounded-md uppercase tracking-wider shadow-sm truncate">
+                                    ${p.razon || 'No convocado'}
+                                </span>
+                            </div>
+                        </li>
+                    `;
+                }
+                else if(p.mvp === true){
+                    html += `
+                        <li class="flex justify-between items-center py-3 px-4 border border-white/5 rounded-xl bg-black/30 hover:bg-black/50 transition">
+                            <span class="text-xs md:text-sm font-semibold text-gray-200 flex items-center truncate pr-2 w-[55%]">
+                                Vs ${p.partido || 'Desconocido'}
+                                <span class="ml-2 text-[9px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded tracking-wider border border-white/5">
+                                    ${p.resultado || '-'}
+                                </span>
+                            </span>
+                            <div class="flex gap-1.5 w-[45%] justify-end">
+                                <span class="text-[11px] font-bold bg-white/10 px-2 py-1 rounded-md text-white flex items-center gap-1 shadow-sm">⚽ ${p.goles || 0}</span>
+                                <span class="text-[11px] font-bold bg-white/10 px-2 py-1 rounded-md text-white flex items-center gap-1 shadow-sm">👟 ${p.asistencias || 0}</span>
+                                 <span class="text-[11px] font-bold bg-white/10 px-2 py-1 rounded-md text-white flex items-center gap-1 shadow-sm">⭐ ${"MVP" || 0}</span>
+                                
+                            </div>
+                        </li>
+                    `;
+                }
+                else if(p.mvp ===  false){
+                    html += `
+                        <li class="flex justify-between items-center py-3 px-4 border border-white/5 rounded-xl bg-black/30 hover:bg-black/50 transition">
+                            <span class="text-xs md:text-sm font-semibold text-gray-200 flex items-center truncate pr-2 w-[55%]">
+                                Vs ${p.partido || 'Desconocido'}
+                                <span class="ml-2 text-[9px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded tracking-wider border border-white/5">
+                                    ${p.resultado || '-'}
+                                </span>
+                            </span>
+                            <div class="flex gap-1.5 w-[45%] justify-end">
+                                <span class="text-[11px] font-bold bg-white/10 px-2 py-1 rounded-md text-white flex items-center gap-1 shadow-sm">⚽ ${p.goles || 0}</span>
+                                <span class="text-[11px] font-bold bg-white/10 px-2 py-1 rounded-md text-white flex items-center gap-1 shadow-sm">👟 ${p.asistencias || 0}</span>
+                                
+                            </div>
+                        </li>
+                    `;
+                }
+            });
+            
+            lista.innerHTML = html;
+        }
+
+        // 4. MOSTRAR LOS DATOS EN LA PANTALLA
         function mostrarJugador(jugador) {
-            // Mostramos el contenedor (le quitamos el display: hidden)
-            perfilJugadorContainer.classList.remove("hidden");
-            perfilJugadorContainer.classList.add("md:flex");
+            // Mostramos el contenedor dividido
+            mainDatosContainer.classList.remove("hidden");
 
             // Textos
             document.getElementById("nombreJugador").textContent = jugador.nombre || "Desconocido";
             document.getElementById("posicionJugador").textContent = jugador.posicion || "Sin posición";
 
-
             const dorsal = jugador.dorsal || "-";
             document.getElementById("dorsalJugador").textContent = dorsal;
-            document.getElementById("dorsalFondo").textContent = dorsal; // El número gigante del fondo
+            document.getElementById("dorsalFondo").textContent = dorsal; 
 
-            // Estadísticas (Si es null o no existe, ponemos 0)
+            // Estadísticas Generales
             document.getElementById("partidosJugador").textContent = jugador.partidos || 0;
             document.getElementById("golesJugador").textContent = jugador.goles || 0;
             document.getElementById("asistenciasJugador").textContent = jugador.asistencias || 0;
             document.getElementById("mvpjugador").textContent = jugador.mvps || 0;
 
-            // Foto: Si tiene URL en la base de datos la pone, si no, pone un placeholder genérico
+            // Foto
             const fotoImg = document.getElementById("fotoJugador");
             if (jugador.foto && jugador.foto.trim() !== "") {
                 fotoImg.src = jugador.foto;
             } else {
-                // Genera una imagen por defecto con las iniciales del jugador
-                const iniciales = (jugador.nombre || "Jugador").substring(0, 2).toUpperCase();
                 fotoImg.src = `https://00team.vercel.app/public/${jugador.nombre}.png`;
             }
+
+            // Llamamos a la función que pinta la ventana derecha del historial
+            cargarHistorialIndividual(jugador.nombre);
         }
 
-        // 4. EVENTOS
+        // 5. EVENTOS
         selectTemporada.addEventListener("change", actualizarJugadoresPorTemporada);
 
         selectJugador.addEventListener("change", () => {
