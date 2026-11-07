@@ -236,7 +236,6 @@
             }
         }
 
-        // 3. CARGAR EL HISTORIAL INDIVIDUAL DESDE datos_potm
         // 3. CARGAR EL HISTORIAL INDIVIDUAL DESDE datos_individuales
         async function cargarHistorialIndividual(nombreJugador) {
             const lista = document.getElementById("listaHistorial");
@@ -261,15 +260,21 @@
 
             let html = "";
             data.forEach(p => {
-                
+                let claseResultado = "text-gray-300";
                 // LÓGICA: Si NO ha jugado
-                if (p.jugado === false) {
+                if (p.jugado === false && p.resultado) {
+                    const goles = p.resultado.split('-');
+                    if (goles[0] > goles[1]) claseResultado = "text-green-400 font-bold";
+                    else if (goles[0] < goles[1]) claseResultado = "text-red-400 font-bold";
+                    else claseResultado = "text-yellow-400 font-bold";
                     html += `
                         <li class="flex justify-between items-center py-3 px-4 border border-red-500/30 rounded-xl bg-red-900/20 hover:bg-red-900/40 transition">
                             <span class="text-xs md:text-sm font-semibold text-red-400/80 flex items-center truncate pr-2 w-[55%]">
                                 Vs ${p.partido || 'Desconocido'}
-                                <span class="ml-2 text-[9px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded tracking-wider border border-white/5">
+                                <span class=" ${claseResultado} ml-2 text-[9px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded tracking-wider border border-white/5">
                                     ${p.resultado}
+                                    
+                
                                 </span>
                             </span>
                             <div class="flex w-[45%] justify-end">
@@ -280,12 +285,16 @@
                         </li>
                     `;
                 }
-                else if(p.mvp === true){
+                else if(p.mvp === true && p.resultado){
+                    const goles = p.resultado.split('-');
+                    if (goles[0] > goles[1]) claseResultado = "text-green-400 font-bold";
+                    else if (goles[0] < goles[1]) claseResultado = "text-red-400 font-bold";
+                    else claseResultado = "text-yellow-400 font-bold";
                     html += `
                         <li class="flex justify-between items-center py-3 px-4 border border-white/5 rounded-xl bg-black/30 hover:bg-black/50 transition">
                             <span class="text-xs md:text-sm font-semibold text-gray-200 flex items-center truncate pr-2 w-[55%]">
                                 Vs ${p.partido || 'Desconocido'}
-                                <span class="ml-2 text-[9px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded tracking-wider border border-white/5">
+                                <span class=" ${claseResultado} ml-2 text-[9px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded tracking-wider border border-white/5">
                                     ${p.resultado || '-'}
                                 </span>
                             </span>
@@ -298,12 +307,16 @@
                         </li>
                     `;
                 }
-                else if(p.mvp ===  false){
+                else if(p.mvp ===  false && p.resultado){
+                    const goles = p.resultado.split('-');
+                    if (goles[0] > goles[1]) claseResultado = "text-green-400 font-bold";
+                    else if (goles[0] < goles[1]) claseResultado = "text-red-400 font-bold";
+                    else claseResultado = "text-yellow-400 font-bold";
                     html += `
                         <li class="flex justify-between items-center py-3 px-4 border border-white/5 rounded-xl bg-black/30 hover:bg-black/50 transition">
                             <span class="text-xs md:text-sm font-semibold text-gray-200 flex items-center truncate pr-2 w-[55%]">
                                 Vs ${p.partido || 'Desconocido'}
-                                <span class="ml-2 text-[9px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded tracking-wider border border-white/5">
+                                <span class=" ${claseResultado} ml-2 text-[9px] bg-white/10 text-gray-300 px-1.5 py-0.5 rounded tracking-wider border border-white/5">
                                     ${p.resultado || '-'}
                                 </span>
                             </span>
