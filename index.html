@@ -67,6 +67,7 @@
         .proximo-partido-card {
             animation: pulse-border 2.5s infinite;
         }
+
         /* --- ESTILOS NAVIDEÑOS --- */
         /* Animación de la nieve cayendo */
         .snowflake {
@@ -81,7 +82,9 @@
         }
 
         @keyframes fall {
-            to { transform: translateY(110vh) rotate(360deg); }
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
         }
 
         /* Animación del trineo de Papá Noel */
@@ -89,7 +92,8 @@
             position: fixed;
             top: 15%;
             left: -300px;
-            font-size: 3rem; /* Tamaño de los emojis */
+            font-size: 3rem;
+            /* Tamaño de los emojis */
             z-index: 50;
             pointer-events: none;
             animation: flySanta 20s linear infinite;
@@ -98,41 +102,58 @@
 
         /* Ruta de vuelo: Entra por la izquierda, baja un poco y sale por la derecha */
         @keyframes flySanta {
-            0% { transform: translateX(-10vw) translateY(0) scale(0.8) rotate(-5deg); }
-            25% { transform: translateX(30vw) translateY(5vh) scale(1) rotate(5deg); }
-            50% { transform: translateX(60vw) translateY(-2vh) scale(0.9) rotate(-5deg); }
-            100% { transform: translateX(120vw) translateY(10vh) scale(1) rotate(5deg); }
+            0% {
+                transform: translateX(-10vw) translateY(0) scale(0.8) rotate(-5deg);
+            }
+
+            25% {
+                transform: translateX(30vw) translateY(5vh) scale(1) rotate(5deg);
+            }
+
+            50% {
+                transform: translateX(60vw) translateY(-2vh) scale(0.9) rotate(-5deg);
+            }
+
+            100% {
+                transform: translateX(120vw) translateY(10vh) scale(1) rotate(5deg);
+            }
         }
+
         /* --- NIEVE ACUMULADA EN TARJETAS Y BOTONES --- */
-        
+
         /* Aseguramos que los elementos sean relativos para poder ponerles la nieve encima */
-        .glass-card, button {
+        .glass-card,
+        button {
             position: relative;
         }
 
         /* Creamos la capa de nieve usando un pseudo-elemento */
-        .glass-card::after, button::after {
+        .glass-card::after,
+        button::after {
             content: '';
             position: absolute;
-            top: -1px; /* Sube un pelín para tapar el borde superior */
+            top: -1px;
+            /* Sube un pelín para tapar el borde superior */
             left: 0;
             width: 100%;
-            height: 14px; /* Grosor de la nieve acumulada */
-            
+            height: 14px;
+            /* Grosor de la nieve acumulada */
+
             /* Dibujo vectorial (SVG) de nieve ondulada metido directamente en el CSS */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='15' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L100,0 L100,5 Q90,15 80,5 Q70,15 60,5 Q50,15 40,5 Q30,15 20,5 Q10,15 0,5 Z' fill='%23ffffff'/%3E%3C/svg%3E");
             background-size: 50px 100%;
             background-repeat: repeat-x;
-            
+
             z-index: 20;
-            pointer-events: none; /* ¡Súper importante para que puedas seguir haciendo clic en los botones! */
-            
+            pointer-events: none;
+            /* ¡Súper importante para que puedas seguir haciendo clic en los botones! */
+
             /* Hereda el redondeo de las esquinas de tu tarjeta o botón para que encaje perfecto */
             border-top-left-radius: inherit;
             border-top-right-radius: inherit;
-            
+
             /* Sombrita para darle volumen 3D a la nieve */
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
             opacity: 0.95;
         }
 
@@ -146,60 +167,65 @@
 
 <body class="p-4 md:p-8">
     <!-- TARJETA MENSAJE NAVIDEÑO DEL JUGADOR -->
-        <div class="glass-card relative overflow-hidden flex flex-col md:flex-row items-center p-6 md:p-8 gap-6 mb-10 border-2 border-red-500/30 rounded-3xl shadow-[0_0_30px_rgba(220,38,38,0.15)] group">
-            
-            <!-- Fondo degradado festivo sutil -->
-            <div class="absolute inset-0 bg-gradient-to-r from-red-900/40 via-[#0b132b] to-green-900/30 z-0"></div>
-            
-            <!-- Luces mágicas de fondo (efecto visual) -->
-            <div class="absolute -top-10 -left-10 w-32 h-32 bg-yellow-500/20 blur-[50px] rounded-full z-0"></div>
-            <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-red-500/20 blur-[50px] rounded-full z-0"></div>
+    <div
+        class="glass-card relative overflow-hidden flex flex-col md:flex-row items-center p-6 md:p-8 gap-6 mb-10 border-2 border-red-500/30 rounded-3xl shadow-[0_0_30px_rgba(220,38,38,0.15)] group">
 
-            <!-- Foto del Jugador con Adorno -->
-            <div class="relative z-10 w-32 h-32 md:w-40 md:h-40 shrink-0">
-                <!-- Marco dorado brillante -->
-                <div class="w-full h-full rounded-full border-4 border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.5)] overflow-hidden relative group-hover:scale-105 transition duration-500">
-                    <!-- Sustituye el src por la foto de tu jugador -->
-                    <img src="https://00team.vercel.app/public/NICO_NAVIDAD.png" class="w-full h-full object-cover" alt="Jugador felicitando" onerror="this.src='https://via.placeholder.com/400x500/1c2541/ffffff?text=Jugador'">
-                </div>
-                <!-- Gorrito de Papá Noel superpuesto en la esquina de la foto -->
-                <div class="absolute -top-4 -right-2 text-4xl md:text-5xl transform rotate-12 drop-shadow-lg animate-bounce" style="animation-duration: 3s;">
-                    🎅🏼
-                </div>
+        <!-- Fondo degradado festivo sutil -->
+        <div class="absolute inset-0 bg-gradient-to-r from-red-900/40 via-[#0b132b] to-green-900/30 z-0"></div>
+
+        <!-- Luces mágicas de fondo (efecto visual) -->
+        <div class="absolute -top-10 -left-10 w-32 h-32 bg-yellow-500/20 blur-[50px] rounded-full z-0"></div>
+        <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-red-500/20 blur-[50px] rounded-full z-0"></div>
+
+        <!-- Foto del Jugador con Adorno -->
+        <div class="relative z-10 w-32 h-32 md:w-40 md:h-40 shrink-0">
+            <!-- Marco dorado brillante -->
+            <div
+                class="w-full h-full rounded-full border-4 border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.5)] overflow-hidden relative group-hover:scale-105 transition duration-500">
+                <!-- Sustituye el src por la foto de tu jugador -->
+                <img src="https://00team.vercel.app/public/NICO_NAVIDAD.png" class="w-full h-full object-cover"
+                    alt="Jugador felicitando"
+                    onerror="this.src='https://via.placeholder.com/400x500/1c2541/ffffff?text=Jugador'">
             </div>
-
-            <!-- Mensaje y Decoración -->
-            <div class="relative z-10 flex-grow text-center md:text-left flex flex-col justify-center">
-                
-                <div class="flex justify-center md:justify-start items-center gap-3 mb-2">
-                    <span class="text-2xl md:text-3xl drop-shadow-lg">🎄</span>
-                    <!-- Texto con gradiente dorado -->
-                    <h2 class="text-3xl md:text-4xl font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-300" style="text-shadow: 0px 4px 15px rgba(250, 204, 21, 0.3);">
-                        ¡Feliz Navidad!
-                    </h2>
-                    <span class="text-2xl md:text-3xl drop-shadow-lg">🎄</span>
-                </div>
-                
-                <h4 class="text-sm font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">Familia 00TEAM</h4>
-                
-                <p class="text-gray-200 font-medium leading-relaxed md:text-lg">
-                    De parte de <strong class="text-yellow-400">Nuestro Mister</strong> y toda la directiva, os deseamos unas felices fiestas llenas de goles, salud y mucho fútbol. ¡Que el 2027 venga cargado de victorias y sigamos haciendo historia juntos en el campo! 🎁⚽✨
-                </p>
-                
-                <!-- Estrellas decorativas inferiores -->
-                <div class="mt-4 flex justify-center md:justify-start gap-2 opacity-70">
-                    <span>⭐</span><span class="text-xs mt-1">⭐</span><span>⭐</span>
-                </div>
+            <!-- Gorrito de Papá Noel superpuesto en la esquina de la foto -->
+            <div class="absolute -top-4 -right-2 text-4xl md:text-5xl transform rotate-12 drop-shadow-lg animate-bounce"
+                style="animation-duration: 3s;">
+                🎅🏼
             </div>
         </div>
-<!-- ANIMACIÓN DE PAPÁ NOEL (VERSIÓN REALISTA) -->
+
+        <!-- Mensaje y Decoración -->
+        <div class="relative z-10 flex-grow text-center md:text-left flex flex-col justify-center">
+
+            <div class="flex justify-center md:justify-start items-center gap-3 mb-2">
+                <span class="text-2xl md:text-3xl drop-shadow-lg">🎄</span>
+                <!-- Texto con gradiente dorado -->
+                <h2 class="text-3xl md:text-4xl font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-300"
+                    style="text-shadow: 0px 4px 15px rgba(250, 204, 21, 0.3);">
+                    ¡Feliz Navidad!
+                </h2>
+                <span class="text-2xl md:text-3xl drop-shadow-lg">🎄</span>
+            </div>
+
+            <h4 class="text-sm font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">Familia 00TEAM</h4>
+
+            <p class="text-gray-200 font-medium leading-relaxed md:text-lg">
+                De parte de <strong class="text-yellow-400">Nuestro Mister</strong> y toda la directiva, os deseamos
+                unas felices fiestas llenas de goles, salud y mucho fútbol. ¡Que el 2027 venga cargado de victorias y
+                sigamos haciendo historia juntos en el campo! 🎁⚽✨
+            </p>
+
+            <!-- Estrellas decorativas inferiores -->
+            <div class="mt-4 flex justify-center md:justify-start gap-2 opacity-70">
+                <span>⭐</span><span class="text-xs mt-1">⭐</span><span>⭐</span>
+            </div>
+        </div>
+    </div>
+    <!-- ANIMACIÓN DE PAPÁ NOEL (VERSIÓN REALISTA) -->
     <div class="santa-sleigh flex items-center">
         <!-- Imagen del trineo (Ajusta el src a la ruta de tu imagen) -->
-        <img 
-            src="https://00team.vercel.app/public/papanoel.png"
-            alt="Trineo de Papá Noel" 
-            class="w-64 md:w-96 drop-shadow-[0_15px_15px_rgba(0,0,0,0.5)] opacity-90"
-        >
+        <img src="https://00team.vercel.app/public/papanoel.png" alt="Trineo de Papá Noel"
+            class="w-64 md:w-96 drop-shadow-[0_15px_15px_rgba(0,0,0,0.5)] opacity-90">
     </div>
     <!-- Efecto visual de fondo -->
     <div
@@ -284,27 +310,103 @@
         </div>
 
     </div>
-
+    <div id="contenedorSanta" class="fixed z-50 pointer-events-none" style="transform: translateY(150%);">
+        <img id="imgSanta" src="https://00team.vercel.app/public/NICO_NAVIDAD.png" alt="Santa"
+            class="w-32 md:w-48 drop-shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+    </div>
     <!-- LIBRERÍAS DE SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="basededatos.js"></script>
 
     <!-- LÓGICA PRINCIPAL -->
     <script>
+        function asomarPapaNoel() {
+            const contenedor = document.getElementById('contenedorSanta');
+            const img = document.getElementById('imgSanta');
+
+            // Elegir un borde al azar: 0=Arriba, 1=Derecha, 2=Abajo, 3=Izquierda
+            const borde = Math.floor(Math.random() * 4);
+
+            // Posición aleatoria a lo largo del borde (entre 10% y 80% para que no se salga de la pantalla)
+            const posicion = Math.floor(Math.random() * 70) + 10;
+
+            // Limpiar posiciones de la vez anterior
+            contenedor.style.top = 'auto';
+            contenedor.style.bottom = 'auto';
+            contenedor.style.left = 'auto';
+            contenedor.style.right = 'auto';
+
+            let transformOculto = '';
+            let transformAsomado = '';
+
+            // Según el borde, lo colocamos, lo giramos y decidimos por dónde entra
+            switch (borde) {
+                case 0: // Arriba
+                    contenedor.style.top = '0';
+                    contenedor.style.left = posicion + '%';
+                    img.style.transform = 'rotate(180deg)'; // Boca abajo
+                    transformOculto = 'translateY(-150%)';
+                    transformAsomado = 'translateY(0)';
+                    break;
+                case 1: // Derecha
+                    contenedor.style.right = '0';
+                    contenedor.style.top = posicion + '%';
+                    img.style.transform = 'rotate(-90deg)'; // Tumbado a la izquierda
+                    transformOculto = 'translateX(150%)';
+                    transformAsomado = 'translateX(0)';
+                    break;
+                case 2: // Abajo
+                    contenedor.style.bottom = '0';
+                    contenedor.style.left = posicion + '%';
+                    img.style.transform = 'rotate(0deg)'; // Normal
+                    transformOculto = 'translateY(150%)';
+                    transformAsomado = 'translateY(0)';
+                    break;
+                case 3: // Izquierda
+                    contenedor.style.left = '0';
+                    contenedor.style.top = posicion + '%';
+                    img.style.transform = 'rotate(90deg)'; // Tumbado a la derecha
+                    transformOculto = 'translateX(-150%)';
+                    transformAsomado = 'translateX(0)';
+                    break;
+            }
+
+            // 1. Lo ponemos en su posición oculta sin que se vea el movimiento
+            contenedor.style.transition = 'none';
+            contenedor.style.transform = transformOculto;
+
+            // 2. Esperamos un milisegundo, activamos la animación de rebote y lo sacamos
+            setTimeout(() => {
+                contenedor.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                contenedor.style.transform = transformAsomado;
+            }, 50);
+
+            // 3. Se esconde después de 2.5 segundos observando
+            setTimeout(() => {
+                contenedor.style.transform = transformOculto;
+            }, 2500);
+
+            // 4. Se programa el siguiente susto en un tiempo aleatorio (entre 3 y 10 segundos después)
+            const proximoAsomo = Math.floor(Math.random() * 3000) + 2000;
+            setTimeout(asomarPapaNoel, proximoAsomo + 1000);
+        }
+
+        // Empezar el bucle 2 segundos después de entrar en la web
+        setTimeout(asomarPapaNoel, 2000);
         <!-- SCRIPT DE NIEVE NAVIDEÑA -->
-    
+
         function crearNieve() {
             const copo = document.createElement('div');
             // Usamos un símbolo de copo de nieve
             copo.innerHTML = '❄';
             copo.className = 'snowflake';
-            
+
             // Posición inicial aleatoria a lo ancho de la pantalla
             copo.style.left = Math.random() * 100 + 'vw';
-            
+
             // Tiempo de caída aleatorio (entre 3 y 8 segundos) para dar profundidad
-            copo.style.animationDuration = Math.random() * 5 + 3 + 's'; 
-            
+            copo.style.animationDuration = Math.random() * 5 + 3 + 's';
+
             // Opacidad y tamaño aleatorio
             copo.style.opacity = Math.random() * 0.7 + 0.3;
             copo.style.fontSize = (Math.random() * 10 + 10) + 'px';
@@ -319,7 +421,7 @@
 
         // Crea un copo de nieve nuevo cada 150 milisegundos
         setInterval(crearNieve, 150);
-    
+
         const temporadaSelect = document.getElementById("temporadaSelect");
         const jornadasContainer = document.getElementById("jornadasContainer");
         const lesionadosContainer = document.getElementById("lesionadosContainer");

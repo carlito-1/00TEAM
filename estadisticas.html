@@ -43,36 +43,42 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #facc15;
         }
-                /* --- NIEVE ACUMULADA EN TARJETAS Y BOTONES --- */
-        
+
+        /* --- NIEVE ACUMULADA EN TARJETAS Y BOTONES --- */
+
         /* Aseguramos que los elementos sean relativos para poder ponerles la nieve encima */
-        .glass-card, button {
+        .glass-card,
+        button {
             position: relative;
         }
 
         /* Creamos la capa de nieve usando un pseudo-elemento */
-        .glass-card::after, button::after {
+        .glass-card::after,
+        button::after {
             content: '';
             position: absolute;
-            top: -1px; /* Sube un pelín para tapar el borde superior */
+            top: -1px;
+            /* Sube un pelín para tapar el borde superior */
             left: 0;
             width: 100%;
-            height: 14px; /* Grosor de la nieve acumulada */
-            
+            height: 14px;
+            /* Grosor de la nieve acumulada */
+
             /* Dibujo vectorial (SVG) de nieve ondulada metido directamente en el CSS */
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='15' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L100,0 L100,5 Q90,15 80,5 Q70,15 60,5 Q50,15 40,5 Q30,15 20,5 Q10,15 0,5 Z' fill='%23ffffff'/%3E%3C/svg%3E");
             background-size: 50px 100%;
             background-repeat: repeat-x;
-            
+
             z-index: 20;
-            pointer-events: none; /* ¡Súper importante para que puedas seguir haciendo clic en los botones! */
-            
+            pointer-events: none;
+            /* ¡Súper importante para que puedas seguir haciendo clic en los botones! */
+
             /* Hereda el redondeo de las esquinas de tu tarjeta o botón para que encaje perfecto */
             border-top-left-radius: inherit;
             border-top-right-radius: inherit;
-            
+
             /* Sombrita para darle volumen 3D a la nieve */
-            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+            filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
             opacity: 0.95;
         }
 
@@ -81,7 +87,8 @@
             height: 8px;
             background-size: 30px 100%;
         }
-          /* --- ESTILOS NAVIDEÑOS --- */
+
+        /* --- ESTILOS NAVIDEÑOS --- */
         /* Animación de la nieve cayendo */
         .snowflake {
             position: fixed;
@@ -95,7 +102,9 @@
         }
 
         @keyframes fall {
-            to { transform: translateY(110vh) rotate(360deg); }
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
         }
     </style>
 </head>
@@ -103,14 +112,20 @@
 <body class="p-4 md:p-8">
 
     <!-- Efecto visual de fondo -->
-    <div class="fixed top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-yellow-500/5 blur-[150px] rounded-full pointer-events-none z-0"></div>
+    <div
+        class="fixed top-1/2 left-0 -translate-y-1/2 w-[500px] h-[500px] bg-yellow-500/5 blur-[150px] rounded-full pointer-events-none z-0">
+    </div>
 
-    <div class="max-w-[1400px] mx-auto relative z-10"> <!-- Ampliado el max-w para que quepan las dos columnas cómodamente -->
+    <div class="max-w-[1400px] mx-auto relative z-10">
+        <!-- Ampliado el max-w para que quepan las dos columnas cómodamente -->
 
         <!-- ENCABEZADO -->
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
-            <h1 class="text-3xl font-extrabold tracking-tight uppercase">Estadísticas de <span class="accent-gold">Jugadores</span></h1>
-            <button onclick="window.history.back()" class="border border-gray-500 text-gray-300 px-5 py-2.5 rounded-lg hover:border-white hover:text-white transition uppercase text-sm tracking-wider font-bold">
+        <div
+            class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 glass-card p-6 rounded-2xl border-t-4 border-t-yellow-400">
+            <h1 class="text-3xl font-extrabold tracking-tight uppercase">Estadísticas de <span
+                    class="accent-gold">Jugadores</span></h1>
+            <button onclick="window.history.back()"
+                class="border border-gray-500 text-gray-300 px-5 py-2.5 rounded-lg hover:border-white hover:text-white transition uppercase text-sm tracking-wider font-bold">
                 Volver
             </button>
         </div>
@@ -119,16 +134,20 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-5xl mx-auto">
             <!-- Temporada -->
             <div class="glass-card p-4 rounded-xl flex flex-col gap-2">
-                <label for="selectTemporada" class="text-xs font-bold text-gray-400 uppercase tracking-wider">Temporada:</label>
-                <select id="selectTemporada" class="bg-[#1c2541] border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
+                <label for="selectTemporada"
+                    class="text-xs font-bold text-gray-400 uppercase tracking-wider">Temporada:</label>
+                <select id="selectTemporada"
+                    class="bg-[#1c2541] border border-gray-600 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
                     <option value="">Cargando...</option>
                 </select>
             </div>
 
             <!-- Jugador -->
             <div class="glass-card p-4 rounded-xl flex flex-col gap-2 border-yellow-400/30 border">
-                <label for="selectJugador" class="text-xs font-bold text-yellow-400 uppercase tracking-wider">Jugador:</label>
-                <select id="selectJugador" class="bg-[#1c2541] border border-yellow-500/50 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
+                <label for="selectJugador"
+                    class="text-xs font-bold text-yellow-400 uppercase tracking-wider">Jugador:</label>
+                <select id="selectJugador"
+                    class="bg-[#1c2541] border border-yellow-500/50 text-white text-sm rounded-lg focus:ring-yellow-400 focus:border-yellow-400 block p-2.5 outline-none font-semibold cursor-pointer">
                     <option value="">Cargando...</option>
                 </select>
             </div>
@@ -143,8 +162,12 @@
                 <!-- Foto -->
                 <div class="w-full sm:w-2/5 bg-[#1c2541]/50 relative flex-shrink-0">
                     <!-- Dorsal gigante de fondo (decorativo) -->
-                    <div id="dorsalFondo" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[150px] font-black text-white/5 z-0 select-none">10</div>
-                    <img id="fotoJugador" class="w-full h-80 sm:h-full object-cover object-top relative z-10 min-h-[400px]" src="https://via.placeholder.com/400x500/1c2541/ffffff?text=Sin+Foto" alt="Foto del Jugador" />
+                    <div id="dorsalFondo"
+                        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[150px] font-black text-white/5 z-0 select-none">
+                        10</div>
+                    <img id="fotoJugador"
+                        class="w-full h-80 sm:h-full object-cover object-top relative z-10 min-h-[400px]"
+                        src="https://via.placeholder.com/400x500/1c2541/ffffff?text=Sin+Foto" alt="Foto del Jugador" />
                 </div>
 
                 <!-- Información y Stats -->
@@ -153,10 +176,14 @@
                     <div class="mb-8 border-b border-gray-700/50 pb-6">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h2 id="nombreJugador" class="text-3xl lg:text-4xl font-black uppercase text-white mb-2 truncate">Cargando...</h2>
-                                <p class="text-lg text-yellow-400 font-bold tracking-wide" id="posicionJugador">Posición</p>
+                                <h2 id="nombreJugador"
+                                    class="text-3xl lg:text-4xl font-black uppercase text-white mb-2 truncate">
+                                    Cargando...</h2>
+                                <p class="text-lg text-yellow-400 font-bold tracking-wide" id="posicionJugador">Posición
+                                </p>
                             </div>
-                            <div class="bg-yellow-400 text-[#0b132b] w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-xl font-black text-xl shadow-[0_0_15px_rgba(250,204,21,0.4)]" id="dorsalJugador">
+                            <div class="bg-yellow-400 text-[#0b132b] w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-xl font-black text-xl shadow-[0_0_15px_rgba(250,204,21,0.4)]"
+                                id="dorsalJugador">
                                 -
                             </div>
                         </div>
@@ -164,24 +191,33 @@
 
                     <!-- Cuadrícula de Estadísticas -->
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
-                            <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Partidos</span>
+                        <div
+                            class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
+                            <span
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Partidos</span>
                             <span id="partidosJugador" class="text-2xl font-black text-white">0</span>
                         </div>
 
-                        <div class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
-                            <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Goles</span>
+                        <div
+                            class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
+                            <span
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Goles</span>
                             <span id="golesJugador" class="text-2xl font-black text-green-400">0</span>
                         </div>
 
-                        <div class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
-                            <span class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Asistencias</span>
+                        <div
+                            class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition">
+                            <span
+                                class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Asistencias</span>
                             <span id="asistenciasJugador" class="text-2xl font-black text-blue-400">0</span>
                         </div>
 
-                        <div class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition relative overflow-hidden">
+                        <div
+                            class="bg-black/30 p-4 rounded-xl text-center border border-gray-700/50 hover:border-yellow-400/50 transition relative overflow-hidden">
                             <div class="absolute inset-0 bg-gradient-to-br from-yellow-400/5 to-transparent z-0"></div>
-                            <span class="block text-xs font-bold text-yellow-500/80 uppercase tracking-wider mb-1 relative z-10">MVPs 🏆</span>
+                            <span
+                                class="block text-xs font-bold text-yellow-500/80 uppercase tracking-wider mb-1 relative z-10">MVPs
+                                🏆</span>
                             <span id="mvpjugador" class="text-2xl font-black text-yellow-400 relative z-10">0</span>
                         </div>
                     </div>
@@ -196,12 +232,13 @@
                     </h3>
                     <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mt-1">Desglose de actuaciones</p>
                 </div>
-                
+
                 <!-- Lista con Scroll -->
                 <div class="p-6 md:p-8 pt-4 overflow-y-auto flex-grow">
                     <ul id="listaHistorial" class="m-0 p-0 space-y-3">
                         <!-- Se inyecta por JS -->
-                        <li class="text-gray-400 text-sm italic text-center py-4">Selecciona un jugador para ver su historial...</li>
+                        <li class="text-gray-400 text-sm italic text-center py-4">Selecciona un jugador para ver su
+                            historial...</li>
                     </ul>
                 </div>
             </div>
@@ -215,18 +252,18 @@
     <script src="basededatos.js"></script>
 
     <script>
-                function crearNieve() {
+        function crearNieve() {
             const copo = document.createElement('div');
             // Usamos un símbolo de copo de nieve
             copo.innerHTML = '❄';
             copo.className = 'snowflake';
-            
+
             // Posición inicial aleatoria a lo ancho de la pantalla
             copo.style.left = Math.random() * 100 + 'vw';
-            
+
             // Tiempo de caída aleatorio (entre 3 y 8 segundos) para dar profundidad
-            copo.style.animationDuration = Math.random() * 5 + 3 + 's'; 
-            
+            copo.style.animationDuration = Math.random() * 5 + 3 + 's';
+
             // Opacidad y tamaño aleatorio
             copo.style.opacity = Math.random() * 0.7 + 0.3;
             copo.style.fontSize = (Math.random() * 10 + 10) + 'px';
@@ -245,7 +282,7 @@
         const selectJugador = document.getElementById("selectJugador");
         const mainDatosContainer = document.getElementById("mainDatosContainer");
 
-        let todaLaData = []; 
+        let todaLaData = [];
         let jugadoresTemporadaActual = [];
 
         // 1. CARGAR DATOS GENERALES DE LA BASE DE DATOS
@@ -298,7 +335,7 @@
 
             jugadoresTemporadaActual.forEach((j) => {
                 const option = document.createElement("option");
-                option.value = j.id; 
+                option.value = j.id;
                 option.textContent = j.nombre;
 
                 if (j.nombre === jugadorActualNombre) {
@@ -365,7 +402,7 @@
                         </li>
                     `;
                 }
-                else if(p.mvp === true && p.resultado){
+                else if (p.mvp === true && p.resultado) {
                     const goles = p.resultado.split('-');
                     if (goles[0] > goles[1]) claseResultado = "text-green-400 font-bold";
                     else if (goles[0] < goles[1]) claseResultado = "text-red-400 font-bold";
@@ -387,7 +424,7 @@
                         </li>
                     `;
                 }
-                else if(p.mvp ===  false && p.resultado){
+                else if (p.mvp === false && p.resultado) {
                     const goles = p.resultado.split('-');
                     if (goles[0] > goles[1]) claseResultado = "text-green-400 font-bold";
                     else if (goles[0] < goles[1]) claseResultado = "text-red-400 font-bold";
@@ -409,7 +446,7 @@
                     `;
                 }
             });
-            
+
             lista.innerHTML = html;
         }
 
@@ -424,7 +461,7 @@
 
             const dorsal = jugador.dorsal || "-";
             document.getElementById("dorsalJugador").textContent = dorsal;
-            document.getElementById("dorsalFondo").textContent = dorsal; 
+            document.getElementById("dorsalFondo").textContent = dorsal;
 
             // Estadísticas Generales
             document.getElementById("partidosJugador").textContent = jugador.partidos || 0;
